@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carwash Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .logo-container {
+            margin-bottom: 1rem;
+        }
+        .logo-container svg {
+            width: 100px;
+            height: 100px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .input-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        input {
+            width: 100%;
+            padding: 10px 10px 10px 35px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #4CAF50;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .register-button {
+            background-color: #2196F3;
+        }
+        .register-button:hover {
+            background-color: #1976D2;
+        }
+        .error-message {
+            color: #f44336;
+            margin-bottom: 1rem;
+            font-size: 14px;
+        }
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            input, button {
+                font-size: 14px;
+            }
+            .logo-container svg {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="logo-container">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="40" width="80" height="40" rx="5" fill="#4CAF50"/>
+            <circle cx="30" cy="80" r="10" fill="#333"/>
+            <circle cx="70" cy="80" r="10" fill="#333"/>
+            <path d="M20 40 Q50 10 80 40" stroke="#4CAF50" stroke-width="8" fill="none"/>
+            <path d="M30 25 Q50 5 70 25" stroke="#4CAF50" stroke-width="4" fill="none"/>
+            <rect x="25" y="50" width="50" height="20" fill="#fff"/>
+        </svg>
+    </div>
+    <h1>Carwash Login</h1>
+    <div th:if="${param.error}" class="error-message">
+        Invalid username or password.
+    </div>
+    <form th:action="@{/api/authenticate}" method="post">
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <a href="/register" class="register-link">
+        <button type="button" class="register-button">Register</button>
+    </a>
+</div>
+</body>
+</html>

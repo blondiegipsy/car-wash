@@ -1,0 +1,10 @@
+spring.application.name=carwash
+
+spring.flyway.url=
+spring.flyway.user=
+spring.flyway.password=
+
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
