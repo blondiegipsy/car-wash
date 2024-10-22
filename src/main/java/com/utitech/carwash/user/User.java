@@ -1,4 +1,4 @@
-package com.utitech.carwash;
+package com.utitech.carwash.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

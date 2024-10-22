@@ -1,8 +1,8 @@
 package com.utitech.carwash.controller;
 
-import com.utitech.carwash.User;
-import com.utitech.carwash.UserDTO;
-import com.utitech.carwash.UserRepository;
+import com.utitech.carwash.user.User;
+import com.utitech.carwash.user.UserDTO;
+import com.utitech.carwash.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
