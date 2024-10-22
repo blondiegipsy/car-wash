@@ -32,6 +32,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("com.pi4j:pi4j-core:2.7.0")
 }
 
 tasks.withType<Test> {
