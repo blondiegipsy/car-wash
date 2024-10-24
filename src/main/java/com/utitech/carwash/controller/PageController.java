@@ -8,11 +8,16 @@ public class PageController {
 
     @GetMapping("/login")
     public String login() {
-        return "login_page";
+        return "login";
     }
 
-    @GetMapping("/register")
-    public String register() {
-        return "register_page";
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "dashboard";
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin";
     }
 }

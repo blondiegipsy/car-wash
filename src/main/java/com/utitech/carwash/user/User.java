@@ -29,10 +29,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (!isAdmin) {
-            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-
+        return !isAdmin ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) : Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 }

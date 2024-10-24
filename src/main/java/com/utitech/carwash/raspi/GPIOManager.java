@@ -5,9 +5,7 @@ import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalOutputConfigBuilder;
 import com.pi4j.io.gpio.digital.DigitalState;
-import org.springframework.stereotype.Service;
 
-@Service
 public class GPIOManager {
 
     private final DigitalOutput digitalOutput;

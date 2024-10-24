@@ -1,11 +1,82 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kezelőfelület</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-50">
+<div class="min-h-screen flex flex-col">
+    <!-- Main Content Card -->
+    <div class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="px-6 py-4 bg-white border-b flex justify-between items-center">
+                <h1 class="text-xl font-semibold text-gray-800" th:text="${'Hello, ' + #authentication.name}">Hello, User</h1>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit"
+                            class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200">
+                        Kijelentkezés
+                    </button>
+                </form>
+            </div>
 
+            <!-- Balance Card -->
+            <div class="p-6">
+                <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-400 text-sm">Egyenleg</p>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-white text-2xl font-bold" th:text="${'RON ' + #numbers.formatDecimal(balance, 0, 'COMMA', 0, 'POINT')}">RON 0</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exchange Rate -->
+                <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                    <p class="text-center text-gray-600 font-medium" th:text="${'1 RON = ' + exchangeRate + 's'}">1 RON = 40s</p>
+                </div>
+
+                <!-- Number Input -->
+                <div class="relative mb-6">
+                    <input type="number"
+                           placeholder="Pénzösszeg megadása"
+                           min="0"
+                           class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg">
+                </div>
+
+
+                <!-- Washer Buttons -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="none" stroke="black" stroke-width="2">
+                            <path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/>
+                        </svg>
+
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="none" stroke="black" stroke-width="2">
+                            <path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/>
+                        </svg>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-sm text-gray-500">
+        © 2024 Minden el van intézve
+    </footer>
+</div>
 </body>
 </html>
