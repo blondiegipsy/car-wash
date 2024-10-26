@@ -28,17 +28,22 @@ public class RelayController {
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
         relay.high();
-        relay.low();
         context.describe();
         context.boardInfo();
         context.hasIO("17");
         context.getPlatform();
         context.providers();
         context.registry();
-        context.shutdown();
         System.out.println(relay);
         System.out.println(relay.describe());
         System.out.println(relay.provider());
+        System.out.println(relay.getAddress());
+        System.out.println(context.boardInfo());
+        System.out.println(context.getPlatform());
+        System.out.println(context.registry());
+        System.out.println(context.providers());
+        System.out.println(relay.state());
+        context.shutdown();
         return "Relay turned on";
     }
 }
