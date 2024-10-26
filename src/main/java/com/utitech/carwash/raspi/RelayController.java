@@ -39,7 +39,6 @@ public class RelayController {
         System.out.println(relay.provider());
         System.out.println(relay.getAddress());
         System.out.println(context.boardInfo());
-        System.out.println(context.getPlatform());
         System.out.println(context.registry());
         System.out.println(context.providers());
         System.out.println(relay.state());
