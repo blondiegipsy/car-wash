@@ -33,6 +33,8 @@ dependencies {
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     annotationProcessor("org.projectlombok:lombok")
     implementation("com.pi4j:pi4j-core:2.7.0")
+    implementation("com.pi4j:pi4j-plugin-raspberrypi:2.7.0")
+
     implementation("com.pi4j:pi4j-plugin-pigpio:2.7.0")
 }
 
