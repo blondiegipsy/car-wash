@@ -15,34 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RelayController {
 
-    private final DigitalOutput relay;
-    Context context = Pi4J.newAutoContext();
-
-    @Autowired
-    public RelayController(Context context) {
-
-        // Configure GPIO pin BCM 17 as digital output
-        relay = context.dout().create(17);
-    }
-
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
-        relay.high();
-        context.describe();
-        context.boardInfo();
-        context.hasIO("17");
-        context.getPlatform();
-        context.providers();
-        context.registry();
-        System.out.println(relay);
-        System.out.println(relay.describe());
-        System.out.println(relay.provider());
-        System.out.println(relay.getAddress());
-        System.out.println(context.boardInfo());
-        System.out.println(context.registry());
-        System.out.println(context.providers());
-        System.out.println(relay.state());
-        context.shutdown();
+
+        var pi4j = Pi4J.newAutoContext();
+        var led = pi4j.digitalOutput().create(17);
+
+led.high();
         return "Relay turned on";
     }
 }
