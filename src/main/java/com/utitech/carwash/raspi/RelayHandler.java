@@ -1,11 +1,9 @@
 package com.utitech.carwash.raspi;
 
 import com.pi4j.Pi4J;
+import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
-import com.pi4j.platform.Platforms;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class RelayHandler {
