@@ -26,6 +26,7 @@ public class RelayController {
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
         relay.high();
+        relay.low();
         return "Relay turned on";
     }
 }
