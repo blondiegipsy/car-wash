@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RelayHandler {
 
-    @Bean
     public void switchRelay() {
         var pi4j = Pi4J.newAutoContext();
 
