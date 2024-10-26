@@ -32,8 +32,15 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     annotationProcessor("org.projectlombok:lombok")
-    implementation("com.pi4j:pi4j-core:2.7.0")
+    implementation("com.pi4j:pi4j-plugin-pigpio:2.7.0")
 }
+
+tasks.jar{
+    manifest.attributes["Main-Class"] = "com.utitech.carwash.CarwashApplication"
+    val dependencies = configurations.runtimeClasspath.get().map(::zipTree)
+    from(dependencies)
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
