@@ -1,5 +1,6 @@
 package com.utitech.carwash.raspi;
 
+import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
@@ -15,18 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class RelayController {
 
     private final DigitalOutput relay;
+    Context context = Pi4J.newAutoContext();
 
     @Autowired
-    public RelayController(Context pi4j) {
+    public RelayController(Context context) {
 
         // Configure GPIO pin BCM 17 as digital output
-        relay = pi4j.dout().create(17);
+        relay = context.dout().create(17);
     }
 
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
         relay.high();
         relay.low();
+        context.describe();
+        context.boardInfo();
+        context.hasIO("17");
+        context.getPlatform();
+        context.providers();
+        context.registry();
+        context.shutdown();
         return "Relay turned on";
     }
 }
