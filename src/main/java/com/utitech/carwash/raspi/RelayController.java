@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RelayController {
 
-    private RelayHandler relayService;
+    private final RelayHandler relayService;
 
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
