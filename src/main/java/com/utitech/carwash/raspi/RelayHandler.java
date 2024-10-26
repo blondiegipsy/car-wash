@@ -13,18 +13,31 @@ public class RelayHandler {
     public void relaySwitch() {
         var pi4j = Pi4J.newAutoContext();
 
-        Platforms platforms = pi4j.platforms();
+        var output = pi4j.dout().create(17);
+        output.config().shutdownState(DigitalState.LOW);
 
-        pi4j.describe().size();
 
-        platforms.describe().print(System.out);
+// setup a digital output listener to listen for any state changes on the digital output
+        output.addListener(System.out::println);
 
-        final int PIN_LED = 17; // PIN 15 = BCM 22
+// lets invoke some changes on the digital output
+        output.state(DigitalState.HIGH)
+                .state(DigitalState.LOW)
+                .state(DigitalState.HIGH)
+                .state(DigitalState.LOW);
 
-        var led = pi4j.digitalOutput().create(PIN_LED);
+// lets toggle the digital output state a few times
+        output.toggle()
+                .toggle()
+                .toggle();
 
-        while (true) {
-            led.high();
-        }
+// another friendly method of setting output state
+        output.high()
+                .low();
+
+// lets read the digital output state
+        System.out.print("CURRENT DIGITAL OUTPUT [" + output + "] STATE IS [");
+        System.out.println(output.state() + "]");
+
     }
 }
