@@ -36,6 +36,9 @@ public class RelayController {
         context.providers();
         context.registry();
         context.shutdown();
+        System.out.println(relay);
+        System.out.println(relay.describe());
+        System.out.println(relay.provider());
         return "Relay turned on";
     }
 }
