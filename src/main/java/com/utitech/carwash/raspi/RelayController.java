@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RelayController {
 
+    private final RelayHandler relayHandler;
+
     @GetMapping("/on")
     public String turnRelayOn() throws Exception {
-
-        var pi4j = Pi4J.newAutoContext();
-        var led = pi4j.digitalOutput().create(17);
-
-led.high();
+        relayHandler.startWasher(2, 10, 1);
         return "Relay turned on";
     }
 }

@@ -23,16 +23,6 @@ configurations {
     }
 }
 
-tasks.register<Jar>("fatJar") {
-    archiveClassifier = "fat"
-    from(sourceSets.main.get().output)
-    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get().filter {
-            it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-}
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -45,16 +35,22 @@ dependencies {
     implementation("com.pi4j:pi4j-core:2.7.0")
     implementation("com.pi4j:pi4j-plugin-raspberrypi:2.7.0")
     implementation("com.pi4j:pi4j-plugin-pigpio:2.7.0")
-    implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
 }
-
-tasks.jar{
-    manifest.attributes["Main-Class"] = "com.utitech.carwash.CarwashApplication"
-    val dependencies = configurations.runtimeClasspath.get().map(::zipTree)
-    from(dependencies)
-}
-
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    // Enable executable jar
+    launchScript()
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // Include all dependencies
+    archiveClassifier.set("all")
+
+    // Ensure application.properties is included
+    from("src/main/resources") {
+        include("application.properties")
+        into("BOOT-INF/classes")
+    }
 }

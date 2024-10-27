@@ -1,41 +1,53 @@
 package com.utitech.carwash.raspi;
 
 import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
-import com.pi4j.io.gpio.digital.DigitalState;
-import org.springframework.stereotype.Component;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Service;
 
-@Component
+import java.time.Duration;
+import java.time.Instant;
+import java.util.TimerTask;
+
+@Service
+@RequiredArgsConstructor
+@Getter
 public class RelayHandler {
+    private final Context pi4j = Pi4J.newAutoContext();
+    private final TaskScheduler taskScheduler;
 
-    public void relaySwitch() {
-        var pi4j = Pi4J.newAutoContext();
+    private static final int BUTTON_DISABLE_1 = 23;
+    private static final int BUTTON_DISABLE_2 = 24;
+    private static final int WASHER_1 = 17;
+    private static final int WASHER_2 = 27;
 
-        var output = pi4j.dout().create(17);
-        output.config().shutdownState(DigitalState.LOW);
+    private final DigitalOutput buttonDisable1 = pi4j.digitalOutput().create(BUTTON_DISABLE_1);
+    private final DigitalOutput buttonDisable2 = pi4j.digitalOutput().create(BUTTON_DISABLE_2);
+    private final DigitalOutput washerStart1 = pi4j.digitalOutput().create(17);
+    private final DigitalOutput washerStart2 = pi4j.digitalOutput().create(27);
 
+    private boolean washer1state;
+    private boolean washer2state;
 
-// setup a digital output listener to listen for any state changes on the digital output
-        output.addListener(System.out::println);
+    public void startWasher(int washerNumber, int balance, int disableRelay) throws InterruptedException {
+        if (washerStart1.state().isHigh()) {
+            throw new RuntimeException("Washer " + washerNumber + " is high");
+        }
+        washer1state = true;
+        washerStart1.high();
+        buttonDisable1.high();
+        timerWasher(balance);
+    }
 
-// lets invoke some changes on the digital output
-        output.state(DigitalState.HIGH)
-                .state(DigitalState.LOW)
-                .state(DigitalState.HIGH)
-                .state(DigitalState.LOW);
-
-// lets toggle the digital output state a few times
-        output.toggle()
-                .toggle()
-                .toggle();
-
-// another friendly method of setting output state
-        output.high()
-                .low();
-
-// lets read the digital output state
-        System.out.print("CURRENT DIGITAL OUTPUT [" + output + "] STATE IS [");
-        System.out.println(output.state() + "]");
-
+    private void timerWasher(int balance) {
+        Runnable task = () -> {
+            washer1state = false;
+            washerStart1.low();
+            buttonDisable1.low();
+        };
+        taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(balance)));
     }
 }
