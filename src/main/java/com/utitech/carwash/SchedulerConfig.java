@@ -1,4 +1,4 @@
-package com.utitech.carwash.raspi;
+package com.utitech.carwash;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
