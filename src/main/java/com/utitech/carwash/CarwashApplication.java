@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CarwashApplication {
 
     public static void main(String[] args) throws InterruptedException {
+        SpringApplication.run(CarwashApplication.class, args);
 
         final var console = new Console();
 

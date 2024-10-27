@@ -5,7 +5,11 @@ plugins {
 }
 
 group = "com.utitech"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+}
 
 java {
     toolchain {
@@ -19,8 +23,14 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
+tasks.register<Jar>("fatJar") {
+    archiveClassifier = "fat"
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter {
+            it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
 
 dependencies {
@@ -34,8 +44,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     implementation("com.pi4j:pi4j-core:2.7.0")
     implementation("com.pi4j:pi4j-plugin-raspberrypi:2.7.0")
-
-    //implementation("com.pi4j:pi4j-plugin-pigpio:2.7.0")
+    implementation("com.pi4j:pi4j-plugin-pigpio:2.7.0")
+    implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
 }
 
 tasks.jar{
