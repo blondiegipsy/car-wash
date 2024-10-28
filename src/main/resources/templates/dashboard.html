@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kezelőfelület</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .washer-on {
+            color: green;
+        }
+        .washer-off {
+            color: red;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 <div class="min-h-screen flex flex-col">
@@ -40,7 +48,7 @@
 
                 <!-- Exchange Rate -->
                 <div class="bg-blue-50 rounded-lg p-4 mb-6">
-                    <p class="text-center text-gray-600 font-medium">1 RON = 40s</p>
+                    <p class="text-center text-gray-600 font-medium">1 RON = 1min</p>
                 </div>
 
                 <!-- Number Input -->
@@ -73,7 +81,7 @@
                         </svg>
 
                     </button>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                    <button th:action="@{/api/washing}" th:method="post" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="none" stroke="black" stroke-width="2">
                             <path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/>
                         </svg>
@@ -81,6 +89,72 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 488L0 171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0L599.8 111.9c24.3 9.7 40.2 33.3 40.2 59.4L640 488c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24l0-264c0-17.7-14.3-32-32-32l-384 0c-17.7 0-32 14.3-32 32l0 264c0 13.3-10.7 24-24 24l-48 0c-13.3 0-24-10.7-24-24zm488 24l-336 0c-13.3 0-24-10.7-24-24l0-56 384 0 0 56c0 13.3-10.7 24-24 24zM128 400l0-64 384 0 0 64-384 0zm0-96l0-80 384 0 0 80-384 0z"/></svg>
                     </button>
                 </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Washer 1 Status -->
+                        <div class="text-center">
+                            <h3 class="font-bold text-lg mb-2">Mosó 1 Állapot</h3>
+                            <div id="washer1status" class="text-lg">
+                                <!--/*@thymesVar id="washer1state" type="com.utitech.carwash.service.RelayHandler"*/-->
+                                <span th:if="${washer1state}" class="text-red-600 font-medium">Használatban</span>
+                                <span th:unless="${washer1state}" class="text-green-600 font-medium">Szabad</span>
+                            </div>
+                        </div>
+
+                        <!-- Washer 2 Status -->
+                        <div class="text-center">
+                            <h3 class="font-bold text-lg mb-2">Mosó 2 Állapot</h3>
+                            <div id="washer2status" class="text-lg">
+                                <!--/*@thymesVar id="washer2state" type="com.utitech.carwash.service.RelayHandler"*/-->
+                                <span th:if="${washer2state}" class="text-red-600 font-medium">Használatban</span>
+                                <span th:unless="${washer2state}" class="text-green-600 font-medium">Szabad</span>
+                            </div>
+                        </div>
+                        <script th:inline="javascript">
+                            function updateWasherStates() {
+                                fetch('/api/state')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const washer1 = document.getElementById('washer1');
+                                        const washer2 = document.getElementById('washer2');
+                                        const washer1status = document.getElementById('washer1status');
+                                        const washer2status = document.getElementById('washer2status');
+
+                                        // Update washer 1
+                                        if (data['washer-1']) {
+                                            washer1.classList.remove('washer-inactive');
+                                            washer1.classList.add('washer-active');
+                                            washer1status.innerHTML = '<span class="text-green-600 font-medium">Használatban</span>';
+                                        } else {
+                                            washer1.classList.remove('washer-active');
+                                            washer1.classList.add('washer-inactive');
+                                            washer1status.innerHTML = '<span class="text-blue-600 font-medium">Szabad</span>';
+                                        }
+
+                                        // Update washer 2
+                                        if (data['washer-2']) {
+                                            washer2.classList.remove('washer-inactive');
+                                            washer2.classList.add('washer-active');
+                                            washer2status.innerHTML = '<span class="text-green-600 font-medium">Használatban</span>';
+                                        } else {
+                                            washer2.classList.remove('washer-active');
+                                            washer2.classList.add('washer-inactive');
+                                            washer2status.innerHTML = '<span class="text-blue-600 font-medium">Szabad</span>';
+                                        }
+                                    })
+                                    .catch(error => console.error('Error fetching washer states:', error));
+                            }
+
+                            // Update states every 5 seconds
+                            setInterval(updateWasherStates, 5000);
+
+                            // Initial update
+                            updateWasherStates();
+                        </script>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>

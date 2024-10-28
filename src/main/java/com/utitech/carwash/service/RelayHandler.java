@@ -37,7 +37,7 @@ public class RelayHandler {
     private boolean washer1state = false;
     private boolean washer2state = false;
 
-    public void mainWashing(int washerNumber, String username, long desiredBalance) {
+    public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         if (user.getBalance() < desiredBalance) {
             throw new RuntimeException("Nincs elég pénz ehhez mosáshoz");
@@ -49,7 +49,9 @@ public class RelayHandler {
                     throw new RuntimeException("Ez a mosó már használatban van");
                 }
                 setWasher1state(true);
-                user.setBalance(desiredBalance);
+                user.setBalance(user.getBalance() - desiredBalance);
+                washer1.high();
+                buttonDisable1.high();
                 Runnable task = () -> {
                     washer1state = false;
                     washer1.low();
@@ -62,7 +64,9 @@ public class RelayHandler {
                     throw new RuntimeException("Ez a mosó már használatban van");
                 }
                 setWasher2state(true);
-                user.setBalance(desiredBalance);
+                user.setBalance(user.getBalance() - desiredBalance);
+                washer2.high();
+                buttonDisable2.high();
                 Runnable task = () -> {
                     washer2state = false;
                     washer2.low();
@@ -71,5 +75,6 @@ public class RelayHandler {
                 taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
             }
         }
+        userRepository.save(user);
     }
 }
