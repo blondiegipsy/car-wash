@@ -1,6 +1,6 @@
 package com.utitech.carwash.service;
 
-import com.utitech.carwash.user.UserRepository;
+import com.utitech.carwash.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

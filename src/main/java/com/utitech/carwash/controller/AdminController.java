@@ -39,5 +39,4 @@ public class AdminController {
         adminService.addBalance(request.username(), request.balance());
         return ResponseEntity.ok().build();
     }
-
 }

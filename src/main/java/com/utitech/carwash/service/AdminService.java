@@ -1,6 +1,9 @@
 package com.utitech.carwash.service;
 
-import com.utitech.carwash.user.UserRepository;
+import com.utitech.carwash.model.Tariffs;
+import com.utitech.carwash.model.TariffsRepository;
+import com.utitech.carwash.model.User;
+import com.utitech.carwash.model.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,13 +16,14 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TariffsRepository tariffsRepository;
 
 
     public void newUser(String username, String password) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new EntityExistsException("Felhasználó már létezik");
         }
-        com.utitech.carwash.user.User user = new com.utitech.carwash.user.User();
+        User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
@@ -33,8 +37,20 @@ public class AdminService {
     }
 
     public void addBalance(String username, Long amount) {
-        com.utitech.carwash.user.User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(" " + username));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(" " + username));
         user.setBalance(user.getBalance() + amount);
         userRepository.save(user);
+    }
+
+    public void setWashingFee(Integer washingFee) {
+        Tariffs tariffs = tariffsRepository.findAll().getFirst();
+        tariffs.setSecondForWashing(washingFee);
+        tariffsRepository.save(tariffs);
+    }
+
+    public void setVacuumingFee(Integer vacuumingFee) {
+        Tariffs tariffs = tariffsRepository.findAll().getFirst();
+        tariffs.setSecondForWashing(vacuumingFee);
+        tariffsRepository.save(tariffs);
     }
 }

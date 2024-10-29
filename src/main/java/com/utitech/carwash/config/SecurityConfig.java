@@ -1,4 +1,4 @@
-package com.utitech.carwash;
+package com.utitech.carwash.config;
 
 import com.utitech.carwash.controller.AuthenticationHandler;
 import lombok.RequiredArgsConstructor;

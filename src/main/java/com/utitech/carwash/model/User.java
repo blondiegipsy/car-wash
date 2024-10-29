@@ -1,4 +1,4 @@
-package com.utitech.carwash.user;
+package com.utitech.carwash.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,8 @@ public class User implements UserDetails {
     private Integer id;
     private String username;
     private String password;
+
+    @Column(columnDefinition = "bigint default 0")
     private Long balance;
     private Boolean isAdmin;
 

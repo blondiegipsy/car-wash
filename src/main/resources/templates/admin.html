@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin felület</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .tab-indicator {
+            transition: transform 0.3s;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            transform: translateY(-2px);
+        }
+        @media (max-width: 640px) {
+            .tab-button:hover {
+                transform: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 <div class="min-h-screen flex flex-col">
@@ -12,14 +37,13 @@
     <div class="bg-white shadow">
         <div class="max-w-4xl mx-auto px-4">
             <div class="py-4">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
                         <h1 class="text-xl font-semibold text-gray-800">Admin kezelőfelület</h1>
                         <p class="text-sm text-gray-600">Felhasználók</p>
                     </div>
                     <form th:action="@{/logout}" method="post">
-                        <button type="submit"
-                                class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200">
+                        <button type="submit" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200">
                             Kijelentkezés
                         </button>
                     </form>
@@ -28,209 +52,281 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex justify-center p-4">
+    <!-- Mobile-Optimized Tabs Navigation -->
+    <div class="bg-white border-b sticky top-0 z-50 shadow-md">
+        <div class="max-w-4xl mx-auto px-2 sm:px-4">
+            <div class="flex justify-center">
+                <div class="flex flex-row w-full sm:w-auto overflow-x-auto sm:overflow-visible no-scrollbar bg-gray-100 rounded-lg p-1 my-4">
+                    <button onclick="switchTab('users')" class="tab-button flex-1 sm:flex-none relative px-3 sm:px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 bg-white shadow text-blue-600 min-w-[100px]">
+                            <span class="flex flex-col sm:flex-row items-center justify-center sm:space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <span>Felhasználók</span>
+                            </span>
+                    </button>
+                    <button onclick="switchTab('history')" class="tab-button flex-1 sm:flex-none relative px-3 sm:px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-gray-50 min-w-[100px]">
+                            <span class="flex flex-col sm:flex-row items-center justify-center sm:space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>Előzmények</span>
+                            </span>
+                    </button>
+                    <button onclick="switchTab('settings')" class="tab-button flex-1 sm:flex-none relative px-3 sm:px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-gray-50 min-w-[100px]">
+                            <span class="flex flex-col sm:flex-row items-center justify-center sm:space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span>Beállítások</span>
+                            </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Contents -->
+    <div class="flex-1 flex justify-center p-2 sm:p-4">
         <div class="w-full max-w-4xl">
-            <!-- Statistics Cards - Mobile First Grid -->
-            <div class="bg-gray-800 rounded-xl p-4 sm:p-6 mb-6">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-gray-400 text-sm">Felhasználók száma</p>
-                        <p class="text-white text-2xl font-bold" >24</p>
+            <!-- Users Tab -->
+            <div id="users" class="tab-content active">
+                <!-- Statistics Cards -->
+                <div class="w-full max-w-4xl">
+                    <!-- Statistics Cards - Mobile First Grid -->
+                    <div class="bg-gray-800 rounded-xl p-4 sm:p-6 mb-6">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
+                                <p class="text-gray-400 text-sm">Felhasználók száma</p>
+                                <p class="text-white text-2xl font-bold" >24</p>
+                            </div>
+                            <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
+                                <p class="text-gray-400      text-sm">Összes egyenleg</p>
+                                <p class="text-white text-2xl font-bold" th:text="${'RON ' + #numbers.formatDecimal(totalBalance, 0, 'COMMA', 0, 'POINT')}">RON 88,989</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-gray-400      text-sm">Összes egyenleg</p>
-                        <p class="text-white text-2xl font-bold" th:text="${'RON ' + #numbers.formatDecimal(totalBalance, 0, 'COMMA', 0, 'POINT')}">RON 88,989</p>
+
+                    <!-- Add User Button - Moved outside table card -->
+                    <div class="mb-4">
+                        <button onclick="document.getElementById('addUserModal').classList.remove('hidden')"
+                                class="w-full sm:w-800 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
+                            </svg>
+                            Új felhasználó hozzáadása
+                        </button>
+                    </div>
+
+                    <!-- User Table Card -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <!-- Mobile View: Scrollable Table Container -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Felhasználónév
+                                    </th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Egyenleg
+                                    </th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Kezelés
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tr th:each="user : ${users}" class="hover:bg-gray-50">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900" th:text="${user.username}">
+                                            username
+                                        </div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                                        <div class="text-sm font-medium" th:classappend="${user.balance < 0 ? 'text-red-600' : 'text-gray-900'}"
+                                             th:text="${'RON ' + #numbers.formatDecimal(user.balance, 0, 'COMMA', 0, 'POINT')}">
+                                            € 3,707
+                                        </div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="openEditModal(this)"
+                                                th:data-username="${user.username}"
+                                                th:data-balance="${user.balance}"
+                                                class="inline-flex items-center text-blue-600 hover:text-blue-900 mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                            </svg>
+                                            <span class="hidden sm:inline">Edit</span>
+                                        </button>
+                                        <button onclick="openDeleteModal(this)"
+                                                th:data-username="${user.username}"
+                                                class="inline-flex items-center text-red-600 hover:text-red-900">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="hidden sm:inline">Delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="addUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                        <div class="min-h-screen flex items-center justify-center p-4">
+                            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
+                                <div class="p-6">
+                                    <h2 class="text-xl font-bold mb-4">Új felhasználó lértehozása</h2>
+                                    <form th:action="@{/admin/user/add}" method="post" class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Felhasználónév</label>
+                                            <input type="text" name="username" required
+                                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Jelszó</label>
+                                            <input type="password" name="password" required
+                                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2 pt-4">
+                                            <button type="submit"
+                                                    class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                                Hozzáadás
+                                            </button>
+                                            <button type="button"
+                                                    onclick="document.getElementById('addUserModal').classList.add('hidden')"
+                                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
+                                                Mégse
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                        <div class="min-h-screen flex items-center justify-center p-4">
+                            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
+                                <div class="p-6">
+                                    <h2 class="text-xl font-bold mb-4">Egyenleg hozzáadása</h2>
+                                    <form th:action="@{/admin/user/edit}" method="post" class="space-y-4">
+                                        <input type="hidden" id="editUsername" name="username">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Felhasználó: </label>
+                                            <p id="editUsernameDisplay" class="mt-1 text-gray-600 font-medium"></p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Egyenleg</label>
+                                            <input type="number" id="editBalance" name="balance" step="0.01" required
+                                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2 pt-4">
+                                            <button type="submit"
+                                                    class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                                Mentés
+                                            </button>
+                                            <button type="button"
+                                                    onclick="document.getElementById('editModal').classList.add('hidden')"
+                                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
+                                                Mégse
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div id="deleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                        <div class="min-h-screen flex items-center justify-center p-4">
+                            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
+                                <div class="p-6">
+                                    <h2 class="text-xl font-bold mb-4">Törlés megerősitése</h2>
+                                    <p class="text-gray-600 mb-6">Biztos vagy benne hogy törlöd a felhasználót? <span id="deleteUsername" class="font-medium"></span>?</p>
+                                    <form th:action="@{/admin/user/delete}" method="post">
+                                        <input type="hidden" id="deleteUsernameInput" name="username">
+                                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2">
+                                            <button type="submit"
+                                                    class="w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                                Felhasználó törlése
+                                            </button>
+                                            <button type="button"
+                                                    onclick="document.getElementById('deleteModal').classList.add('hidden')"
+                                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
+                                                Mégse
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Add User Button - Moved outside table card -->
-            <div class="mb-4">
-                <button onclick="document.getElementById('addUserModal').classList.remove('hidden')"
-                        class="w-full sm:w-800 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3 rounded-lg transition duration-200 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
-                    </svg>
-                    Új felhasználó hozzáadása
-                </button>
+            <!-- History Tab -->
+            <div id="history" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <h2 class="text-xl font-semibold mb-4">Felhasználói előzmények</h2>
+                    <p class="text-gray-600">Az előzmények tartalma ide kerül...</p>
+                </div>
             </div>
 
-            <!-- User Table Card -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <!-- Mobile View: Scrollable Table Container -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Felhasználónév
-                            </th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Egyenleg
-                            </th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Kezelés
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="user : ${users}" class="hover:bg-gray-50">
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900" th:text="${user.username}">
-                                    username
-                                </div>
-                            </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm font-medium" th:classappend="${user.balance < 0 ? 'text-red-600' : 'text-gray-900'}"
-                                     th:text="${'€ ' + #numbers.formatDecimal(user.balance, 0, 'COMMA', 0, 'POINT')}">
-                                    € 3,707
-                                </div>
-                            </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="openEditModal(this)"
-                                        th:data-username="${user.username}"
-                                        th:data-balance="${user.balance}"
-                                        class="inline-flex items-center text-blue-600 hover:text-blue-900 mr-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                    </svg>
-                                    <span class="hidden sm:inline">Edit</span>
-                                </button>
-                                <button onclick="openDeleteModal(this)"
-                                        th:data-username="${user.username}"
-                                        class="inline-flex items-center text-red-600 hover:text-red-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="hidden sm:inline">Delete</span>
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <h2 class="text-xl font-semibold mb-4">Beállítások</h2>
+                    <p class="text-gray-600">A beállítások tartalma ide kerül...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modals - Updated for better mobile experience -->
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
-                <div class="p-6">
-                    <h2 class="text-xl font-bold mb-4">Új felhasználó lértehozása</h2>
-                    <form th:action="@{/admin/user/add}" method="post" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Felhasználónév</label>
-                            <input type="text" name="username" required
-                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Jelszó</label>
-                            <input type="password" name="password" required
-                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2 pt-4">
-                            <button type="submit"
-                                    class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                                Hozzáadás
-                            </button>
-                            <button type="button"
-                                    onclick="document.getElementById('addUserModal').classList.add('hidden')"
-                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
-                                Mégse
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
-                <div class="p-6">
-                    <h2 class="text-xl font-bold mb-4">Egyenleg hozzáadása</h2>
-                    <form th:action="@{/admin/user/edit}" method="post" class="space-y-4">
-                        <input type="hidden" id="editUsername" name="username">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Felhasználó: </label>
-                            <p id="editUsernameDisplay" class="mt-1 text-gray-600 font-medium"></p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Egyenleg</label>
-                            <input type="number" id="editBalance" name="balance" step="0.01" required
-                                   class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2 pt-4">
-                            <button type="submit"
-                                    class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                                Mentés
-                            </button>
-                            <button type="button"
-                                    onclick="document.getElementById('editModal').classList.add('hidden')"
-                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
-                                Mégse
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
-                <div class="p-6">
-                    <h2 class="text-xl font-bold mb-4">Törlés megerősitése</h2>
-                    <p class="text-gray-600 mb-6">Biztos vagy benne hogy törlöd a felhasználót? <span id="deleteUsername" class="font-medium"></span>?</p>
-                    <form th:action="@{/admin/user/delete}" method="post">
-                        <input type="hidden" id="deleteUsernameInput" name="username">
-                        <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2">
-                            <button type="submit"
-                                    class="w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                                Felhasználó törlése
-                            </button>
-                            <button type="button"
-                                    onclick="document.getElementById('deleteModal').classList.add('hidden')"
-                                    class="w-full sm:w-auto px-6 py-2 text-gray-600 border rounded-lg hover:bg-gray-50">
-                                Mégse
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer class="py-4 text-center text-sm text-gray-500">
         © 2024 Minden el van intézve
     </footer>
-
-    <script>
-        function openEditModal(button) {
-            const username = button.getAttribute('data-username');
-            const balance = button.getAttribute('data-balance');
-            document.getElementById('editUsername').value = username;
-            document.getElementById('editUsernameDisplay').textContent = username;
-            document.getElementById('editBalance').value = balance;
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function openDeleteModal(button) {
-            const username = button.getAttribute('data-username');
-            document.getElementById('deleteUsername').textContent = username;
-            document.getElementById('deleteUsernameInput').value = username;
-            document.getElementById('deleteModal').classList.remove('hidden');
-        }
-    </script>
 </div>
 
+<script>
+    function switchTab(tabId) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
 
+        // Show selected tab content
+        document.getElementById(tabId).classList.add('active');
+
+        // Update tab styles
+        document.querySelectorAll('.tab-button').forEach(button => {
+            if (button.textContent.trim().toLowerCase().includes(tabId)) {
+                button.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                button.classList.add('bg-white', 'shadow', 'text-blue-600');
+            } else {
+                button.classList.remove('bg-white', 'shadow', 'text-blue-600');
+                button.classList.add('text-gray-600', 'hover:bg-gray-50');
+            }
+        });
+    }
+
+    function openEditModal(button) {
+        const username = button.getAttribute('data-username');
+        const balance = button.getAttribute('data-balance');
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editUsernameDisplay').textContent = username;
+        document.getElementById('editBalance').value = balance;
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function openDeleteModal(button) {
+        const username = button.getAttribute('data-username');
+        document.getElementById('deleteUsername').textContent = username;
+        document.getElementById('deleteUsernameInput').value = username;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
