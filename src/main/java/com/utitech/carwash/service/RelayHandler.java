@@ -28,14 +28,19 @@ public class RelayHandler {
     private static final int BUTTON_DISABLE_2 = 24;
     private static final int WASHER_1 = 17;
     private static final int WASHER_2 = 27;
+    private static final int VACUUM = 5;
+    private static final int BUTTON_VACUUM_DISABLE = 6;
 
     private final DigitalOutput buttonDisable1 = pi4j.digitalOutput().create(BUTTON_DISABLE_1);
     private final DigitalOutput buttonDisable2 = pi4j.digitalOutput().create(BUTTON_DISABLE_2);
-    private final DigitalOutput washer1 = pi4j.digitalOutput().create(17);
-    private final DigitalOutput washer2 = pi4j.digitalOutput().create(27);
+    private final DigitalOutput washer1 = pi4j.digitalOutput().create(WASHER_1);
+    private final DigitalOutput washer2 = pi4j.digitalOutput().create(WASHER_2);
+    private final DigitalOutput vacuum = pi4j.digitalOutput().create(VACUUM);
+    private final DigitalOutput vacuumButtonDisable = pi4j.digitalOutput().create(BUTTON_VACUUM_DISABLE);
 
     private boolean washer1state = false;
     private boolean washer2state = false;
+    private boolean vacuumState = false;
 
     public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
@@ -71,6 +76,21 @@ public class RelayHandler {
                     washer2state = false;
                     washer2.low();
                     buttonDisable2.low();
+                };
+                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
+            }
+            case VACUUM -> {
+                if (vacuumState) {
+                    throw new RuntimeException("Porszívó már használatban van");
+                }
+                setVacuumState(true);
+                user.setBalance(user.getBalance() - desiredBalance);
+                vacuum.high();
+                vacuumButtonDisable.high();
+                Runnable task = () -> {
+                    vacuumState = false;
+                    vacuum.low();
+                    vacuumButtonDisable.low();
                 };
                 taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
             }
