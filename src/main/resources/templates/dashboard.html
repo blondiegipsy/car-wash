@@ -5,21 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kezelőfelület</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <style>
-        .washer-on {
-            color: green;
-        }
-        .washer-off {
-            color: red;
-        }
-         .material-symbols-outlined {
-             font-variation-settings:
-                     'FILL' 0,
-                     'wght' 400,
-                     'GRAD' 0,
-                     'opsz' 24
-         }
-    </style>
 </head>
 <body class="bg-gray-50">
 <div class="min-h-screen flex flex-col">
@@ -58,9 +43,9 @@
                     <input type="number"
                            placeholder="Pénzösszeg megadása"
                            min="0"
+                           id="balanceInput"
                            class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg">
                 </div>
-
 
                 <div class="grid grid-cols-3 gap-4">
                     <!-- Button with Label -->
@@ -80,16 +65,27 @@
 
                 <!-- Washer Buttons -->
                 <div class="grid grid-cols-3 gap-4">
-                    <button class="bg-green-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                    <button th:method="post" th:classappend="${washer1 == false ? 'bg-green-500' : 'bg-red-500'}" id="washingButton1" class=" hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
                         <img src="/svg/left_arrow.svg" class="w-10 h-10" width="24" height="24" alt="">
                     </button>
-                    <button th:action="@{/api/washing}" th:method="post" class="bg-green-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                    <button th:method="post" th:classappend="${washer2 == false ? 'bg-green-500' : 'bg-red-500'}" id="washingButton2" class=" hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
                         <img src="/svg/right_arrow.svg" class="w-10 h-10" width="24" height="24" alt="">
                     </button>
-
-                    <button th:action="@{/api/washing}" th:method="post" class="bg-green-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
+                    <button th:method="post" th:classappend="${vacuum == false ? 'bg-green-500' : 'bg-red-500'}" id="washingButton3" class="hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-xl transition duration-200 flex items-center justify-center space-x-2">
                         <img src="/svg/vacuum.svg" class="w-10 h-10" width="24" height="24" alt="">
                     </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-700 font-semibold mb-2" th:text="${'1RON = ' + washingTariff + 's'}" >RON</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-700 font-semibold mb-2" th:text="${'1RON = ' + washingTariff + 's'}">RON</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-700 font-semibold mb-2" th:text="${'1RON = ' + vacuumTariff + 's'}">RON</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,6 +95,122 @@
     <footer class="py-4 text-center text-sm text-gray-500">
         © 2024 Minden el van intézve
     </footer>
+
+    <script>
+        $(document).ready(function() {
+            // Function to handle button clicks
+            function handleWasherButton(buttonId, relayNumber) {
+                const inputData = $('#washerInput').val();
+
+                $.ajax({
+                    url: '/api/washing',
+                    method: 'POST',
+                    data: {
+                        buttonId: relayNumber,
+                        inputData: inputData
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            updateButtonStates();  // Fetch latest states after successful action
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            }
+
+            // Function to update button states
+            function updateButtonStates() {
+                $.ajax({
+                    url: '/api/state',
+                    method: 'GET',
+                    success: function(response) {
+                        // Update each button based on the status response
+                        updateButtonState('washingButton1', response.washer1);
+                        updateButtonState('washingButton2', response.washer2);
+                        updateButtonState('washingButton3', response.vacuum);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching states:', error);
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+                // Function to handle button clicks
+                function handleWasherButton(buttonId, relayNumber) {
+                    const inputData = $('#washerInput').val();
+
+                    $.ajax({
+                        url: '/api/washing',
+                        method: 'POST',
+                        data: {
+                            buttonId: relayNumber,
+                            inputData: inputData
+                        },
+                        success: function (response) {
+                            if (response.status === 'success') {
+                                updateButtonStates();
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                            alert('An error occurred. Please try again.');
+                        }
+                    });
+                }
+
+                // Function to update button states
+                function updateButtonStates() {
+                    $.ajax({
+                        url: '/state',  // Updated to match your controller endpoint
+                        method: 'GET',
+                        success: function (response) {
+                            // Update based on the state keys from your controller
+                            updateButtonState('washingButton1', response.washer1);
+                            updateButtonState('washingButton2', response.washer2);
+                            updateButtonState('washingButton3', response.vacuum);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error fetching states:', error);
+                        }
+                    });
+                }
+
+                // Helper function to update individual button state
+                function updateButtonState(buttonId, isActive) {
+                    const button = $(`#${buttonId}`);
+                    if (isActive) {
+                        button.removeClass('bg-green-500').addClass('bg-red-500');
+                    } else {
+                        button.removeClass('bg-red-500').addClass('bg-green-500');
+                    }
+                }
+
+                // Event listeners for each button
+                $('#washingButton1').click(function () {
+                    handleWasherButton('washingButton1', 17);
+                });
+
+                $('#washingButton2').click(function () {
+                    handleWasherButton('washingButton2', 27);
+                });
+
+                $('#washingButton3').click(function () {
+                    handleWasherButton('washingButton3', 5);
+                });
+
+                // Initial state update
+                updateButtonStates();
+
+                // Set up polling every 3 seconds
+                setInterval(updateButtonStates, 3000);
+            });
+        });
+    </script>
+
 </div>
 </body>
 </html>

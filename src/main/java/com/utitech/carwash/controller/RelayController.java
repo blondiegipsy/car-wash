@@ -33,12 +33,11 @@ public class RelayController {
     }
 
     @GetMapping("/state")
-    public String getWasherState(Model model) {
+    public ResponseEntity<?> getWasherState() {
         Map<String, Boolean> state = new HashMap<>();
-        state.put("washer-1",relayHandler.isWasher1state());
-        state.put("washer-2",relayHandler.isWasher2state());
-        model.addAttribute("state", state);
-        return "dashboard";
+        state.put("washer1",relayHandler.isWasher1state());
+        state.put("washer2",relayHandler.isWasher2state());
+        state.put("vacuum",relayHandler.isVacuumState());
+        return ResponseEntity.ok(state);
     }
-
 }

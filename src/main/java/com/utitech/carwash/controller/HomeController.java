@@ -1,5 +1,6 @@
 package com.utitech.carwash.controller;
 
+import com.utitech.carwash.model.TariffsRepository;
 import com.utitech.carwash.model.User;
 import com.utitech.carwash.model.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeController {
     private final UserRepository userRepository;
+    private final TariffsRepository tariffsRepository;
 
     @GetMapping("/login")
     public String login() {
@@ -29,6 +31,8 @@ public class HomeController {
         String username = authentication.getName();
         Long userBalance = userRepository.findByUsername(username).get().getBalance();
         model.addAttribute("userBalance", userBalance);
+        model.addAttribute("washingTariff", tariffsRepository.findAll().getFirst().getSecondForWashing());
+        model.addAttribute("vacuumTariff", tariffsRepository.findAll().getFirst().getSecondForVacuuming());
         return "dashboard";
     }
 

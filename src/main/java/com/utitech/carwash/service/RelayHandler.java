@@ -3,6 +3,7 @@ package com.utitech.carwash.service;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.utitech.carwash.model.TariffsRepository;
 import com.utitech.carwash.model.User;
 import com.utitech.carwash.model.UserRepository;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class RelayHandler {
     private final Context pi4j = Pi4J.newAutoContext();
     private final TaskScheduler taskScheduler;
     private final UserRepository userRepository;
+    private final TariffsRepository tariffsRepository;
 
     private static final int BUTTON_DISABLE_1 = 23;
     private static final int BUTTON_DISABLE_2 = 24;
@@ -33,10 +35,10 @@ public class RelayHandler {
 
     private final DigitalOutput buttonDisable1 = pi4j.digitalOutput().create(BUTTON_DISABLE_1);
     private final DigitalOutput buttonDisable2 = pi4j.digitalOutput().create(BUTTON_DISABLE_2);
+    private final DigitalOutput vacuumButtonDisable = pi4j.digitalOutput().create(BUTTON_VACUUM_DISABLE);
     private final DigitalOutput washer1 = pi4j.digitalOutput().create(WASHER_1);
     private final DigitalOutput washer2 = pi4j.digitalOutput().create(WASHER_2);
     private final DigitalOutput vacuum = pi4j.digitalOutput().create(VACUUM);
-    private final DigitalOutput vacuumButtonDisable = pi4j.digitalOutput().create(BUTTON_VACUUM_DISABLE);
 
     private boolean washer1state = false;
     private boolean washer2state = false;
@@ -62,7 +64,8 @@ public class RelayHandler {
                     washer1.low();
                     buttonDisable1.low();
                 };
-                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
+                Integer duration = tariffsRepository.findAll().getFirst().getSecondForWashing();
+                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance * duration)));
             }
             case WASHER_2 -> {
                 if (washer2state) {
@@ -77,7 +80,8 @@ public class RelayHandler {
                     washer2.low();
                     buttonDisable2.low();
                 };
-                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
+                Integer duration = tariffsRepository.findAll().getFirst().getSecondForWashing();
+                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance * duration)));
             }
             case VACUUM -> {
                 if (vacuumState) {
@@ -92,7 +96,8 @@ public class RelayHandler {
                     vacuum.low();
                     vacuumButtonDisable.low();
                 };
-                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance)));
+                Integer duration = tariffsRepository.findAll().getFirst().getSecondForVacuuming();
+                taskScheduler.schedule(task, Instant.now().plus(Duration.ofSeconds(desiredBalance * duration)));
             }
         }
         userRepository.save(user);
