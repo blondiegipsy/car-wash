@@ -3,7 +3,6 @@ package com.utitech.carwash.controller;
 import com.utitech.carwash.controller.request.BalanceRequest;
 import com.utitech.carwash.controller.request.RegisterRequest;
 import com.utitech.carwash.service.AdminService;
-import com.utitech.carwash.service.UserService;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

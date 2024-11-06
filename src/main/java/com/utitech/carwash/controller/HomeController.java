@@ -1,17 +1,17 @@
 package com.utitech.carwash.controller;
 
-import com.utitech.carwash.model.Tariffs;
-import com.utitech.carwash.model.TariffsRepository;
-import com.utitech.carwash.model.User;
-import com.utitech.carwash.model.UserRepository;
+import com.utitech.carwash.model.*;
 import com.utitech.carwash.service.RelayHandler;
+import com.utitech.carwash.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +22,8 @@ public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
     private final RelayHandler relayHandler;
+    private final LogRepository logRepository;
+    private final UserService userService;
 
     @GetMapping("/login")
     public String login() {
@@ -49,7 +51,8 @@ public class HomeController {
         model.addAttribute("users", getAllUsers());
         Long totalBalance = userRepository.findTotalBalance();
         model.addAttribute("totalBalance", totalBalance);
-
+        model.addAttribute("userCount", userRepository.getAllUsersNumber());
+        model.addAttribute("logs", logRepository.findAll());
         return "admin";
     }
 

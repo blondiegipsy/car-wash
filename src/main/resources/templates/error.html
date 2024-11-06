@@ -92,20 +92,20 @@
 <body>
 <div class="error-card">
     <div class="header">
-        <h1 class="title">Error</h1>
-        <a href="/" class="home-button">Home</a>
+        <h1 class="title">Hiba</h1>
+        <a href="/login" class="home-button">Főoldal</a>
     </div>
 
     <div class="error-box">
         <div class="label">Status</div>
         <div class="error-code">
-            <span th:text="${status ?: 'Error'}">404</span>
-            <span th:text="${error ?: 'Not Found'}">null</span>
+            <span th:text="${status ?: 'Hiba'}">404</span>
+            <span th:text="${error ?: 'Oldal nem található'}">null</span>
         </div>
     </div>
 
     <div class="info-box">
-        <p th:text="${message ?: 'The page you are looking for might have been removed or is temporarily unavailable.'}">
+        <p th:text="${message ?: 'Az oldal nem található vagy áthelyezték.'}">
             Error details
         </p>
     </div>

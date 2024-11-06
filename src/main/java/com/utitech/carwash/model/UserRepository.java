@@ -12,4 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT SUM(u.balance) FROM User u")
     Long findTotalBalance();
+
+    @Query("SELECT COUNT(u.username) FROM User u")
+    Long getAllUsersNumber();
 }

@@ -24,4 +24,5 @@ public class Log {
     private String username;
     private Integer amountUsed;
     private Timestamp createdAt;
+    private String service;
 }

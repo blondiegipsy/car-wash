@@ -3,9 +3,7 @@ package com.utitech.carwash.service;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
-import com.utitech.carwash.model.TariffsRepository;
-import com.utitech.carwash.model.User;
-import com.utitech.carwash.model.UserRepository;
+import com.utitech.carwash.model.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,8 +11,10 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -43,12 +43,14 @@ public class RelayHandler {
     private boolean washer1state = false;
     private boolean washer2state = false;
     private boolean vacuumState = false;
+    private final LogRepository logRepository;
 
     public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
         if (user.getBalance() < desiredBalance) {
             throw new RuntimeException("Nincs elég pénz ehhez mosáshoz");
         }
+
 
         switch (washerNumber) {
             case WASHER_1 -> {
@@ -59,6 +61,7 @@ public class RelayHandler {
                 user.setBalance(user.getBalance() - desiredBalance);
                 washer1.high();
                 buttonDisable1.high();
+                createLog(username, desiredBalance.intValue(), "Mosó 1");
                 Runnable task = () -> {
                     washer1state = false;
                     washer1.low();
@@ -75,6 +78,7 @@ public class RelayHandler {
                 user.setBalance(user.getBalance() - desiredBalance);
                 washer2.high();
                 buttonDisable2.high();
+                createLog(username, desiredBalance.intValue(), "Mosó 2");
                 Runnable task = () -> {
                     washer2state = false;
                     washer2.low();
@@ -91,6 +95,7 @@ public class RelayHandler {
                 user.setBalance(user.getBalance() - desiredBalance);
                 vacuum.high();
                 vacuumButtonDisable.high();
+                createLog(username, desiredBalance.intValue(), "Porszivó");
                 Runnable task = () -> {
                     vacuumState = false;
                     vacuum.low();
@@ -101,5 +106,14 @@ public class RelayHandler {
             }
         }
         userRepository.save(user);
+    }
+
+    private void createLog(String username, Integer desiredBalance, String service) {
+        Log log = new Log();
+        log.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        log.setUsername(username);
+        log.setAmountUsed(desiredBalance);
+        log.setService(service);
+        logRepository.save(log);
     }
 }
