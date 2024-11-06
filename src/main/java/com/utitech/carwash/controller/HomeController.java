@@ -1,8 +1,10 @@
 package com.utitech.carwash.controller;
 
+import com.utitech.carwash.model.Tariffs;
 import com.utitech.carwash.model.TariffsRepository;
 import com.utitech.carwash.model.User;
 import com.utitech.carwash.model.UserRepository;
+import com.utitech.carwash.service.RelayHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
+    private final RelayHandler relayHandler;
 
     @GetMapping("/login")
     public String login() {
@@ -30,9 +33,13 @@ public class HomeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Long userBalance = userRepository.findByUsername(username).get().getBalance();
+        Tariffs tariffs = tariffsRepository.findAll().getFirst();
         model.addAttribute("userBalance", userBalance);
-        model.addAttribute("washingTariff", tariffsRepository.findAll().getFirst().getSecondForWashing());
-        model.addAttribute("vacuumTariff", tariffsRepository.findAll().getFirst().getSecondForVacuuming());
+        model.addAttribute("washingTariff", tariffs.getSecondForWashing());
+        model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
+        model.addAttribute("washer1", relayHandler.isWasher1state());
+        model.addAttribute("washer2", relayHandler.isWasher2state());
+        model.addAttribute("vacuum", relayHandler.isVacuumState());
         return "dashboard";
     }
 

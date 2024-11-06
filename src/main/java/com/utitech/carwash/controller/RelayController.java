@@ -22,10 +22,10 @@ public class RelayController {
 
     @PostMapping("/washing")
     public ResponseEntity<?> turnRelayOn(@RequestBody WashingRequest request) {
-     /*   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();*/
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         try {
-            relayHandler.mainWashing(request.washer(), "faszom", request.balance());
+            relayHandler.mainWashing(request.washer(), username, request.balance());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
