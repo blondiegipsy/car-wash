@@ -5,6 +5,7 @@ import com.utitech.carwash.model.TariffsRepository;
 import com.utitech.carwash.model.User;
 import com.utitech.carwash.model.UserRepository;
 import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,14 +27,16 @@ public class AdminService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
+        user.setBalance(0L);
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(String username) {
         if (userRepository.findByUsername(username).isEmpty()) {
             throw new EntityExistsException("Felhasználó nem létezik");
         }
-        userRepository.delete(userRepository.findByUsername(username).get());
+        userRepository.deleteByUsername(username);
     }
 
     public void addBalance(String username, Long amount) {

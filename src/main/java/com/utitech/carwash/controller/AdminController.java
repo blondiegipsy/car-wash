@@ -4,9 +4,12 @@ import com.utitech.carwash.controller.request.BalanceRequest;
 import com.utitech.carwash.controller.request.RegisterRequest;
 import com.utitech.carwash.service.AdminService;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,19 +21,23 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/add-user")
-    public ResponseEntity<?> newUser(@ModelAttribute RegisterRequest request) {
+    public ResponseEntity<?> newUser(@RequestBody RegisterRequest request) {
         try {
             adminService.newUser(request.username(), request.password());
             return ResponseEntity.ok("Felhasználó sikeresen létrehozva");
         } catch (EntityExistsException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Felhasználó már létezik");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(409));
         }
     }
 
-    @DeleteMapping("/delete-user")
-    public ResponseEntity<?> deleteUser(@RequestParam String username) {
-        adminService.deleteUser(username);
-        return ResponseEntity.ok().build();
+    @GetMapping("/delete-user/{username}")
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        try {
+            adminService.deleteUser(username);
+            return ResponseEntity.ok("Felhasználó sikeresen törölve");
+        } catch (EntityExistsException e) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(409));
+        }
     }
 
     @PutMapping("/add-balance")

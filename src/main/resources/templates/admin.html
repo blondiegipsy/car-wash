@@ -53,7 +53,7 @@
     </div>
 
     <!-- Mobile-Optimized Tabs Navigation -->
-    <div class="bg-white border-b sticky top-0 z-50 shadow-md">
+    <div class="bg-white border-b sticky top-0 z-49 shadow-md">
         <div class="max-w-4xl mx-auto px-2 sm:px-4">
             <div class="flex justify-center">
                 <div class="flex flex-row w-full sm:w-auto overflow-x-auto sm:overflow-visible no-scrollbar bg-gray-100 rounded-lg p-1 my-4">
@@ -103,7 +103,7 @@
                             </div>
                             <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg">
                                 <p class="text-gray-400      text-sm">Összes egyenleg</p>
-                                <p class="text-white text-2xl font-bold" th:text="${'RON ' + #numbers.formatDecimal(totalBalance, 0, 'COMMA', 0, 'POINT')}">RON 88,989</p>
+                                <p class="text-white text-2xl font-bold" th:text="${'RON ' + #numbers.formatDecimal(totalBalance, 0, 'COMMA', 0, 'POINT')}">RON 888,888,989</p>
                             </div>
                         </div>
                     </div>
@@ -124,6 +124,9 @@
                         <!-- Mobile View: Scrollable Table Container -->
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
+                                <div id="responseMessage" class="mt-4 p-4 rounded-lg hidden">
+                                    <p id="messageText" class="text-center"></p>
+                                </div>
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -179,7 +182,7 @@
                             <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
                                 <div class="p-6">
                                     <h2 class="text-xl font-bold mb-4">Új felhasználó lértehozása</h2>
-                                    <form th:action="@{/admin/user/add}" method="post" class="space-y-4">
+                                    <form id="userForm" class="space-y-4" onsubmit="submitForm(event)">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700">Felhasználónév</label>
                                             <input type="text" name="username" required
@@ -246,10 +249,11 @@
                                 <div class="p-6">
                                     <h2 class="text-xl font-bold mb-4">Törlés megerősitése</h2>
                                     <p class="text-gray-600 mb-6">Biztos vagy benne hogy törlöd a felhasználót? <span id="deleteUsername" class="font-medium"></span>?</p>
-                                    <form th:action="@{/admin/user/delete}" method="post">
+                                    <form id="deleteUserForm" method="post">
                                         <input type="hidden" id="deleteUsernameInput" name="username">
                                         <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2">
                                             <button type="submit"
+                                                    onclick="deleteUser(event)"
                                                     class="w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                                                 Felhasználó törlése
                                             </button>
@@ -318,19 +322,19 @@
                                        name="apiKey"
                                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                        placeholder="x">
-                                <div className="flex ml-1">
+                                <div class="flex ml-1">
                                     <button class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         Mentés
                                     </button>
                                 </div>
                             </div>
-                            <div    >
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700">Porszivó percdíj   (1RON = x másodperc)</label>
                                 <input type="url"
                                        name="webhookUrl"
                                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                        placeholder="x">
-                                <div className="flex ml-1">
+                                <div class="flex ml-1">
                                     <button class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         Mentés
                                     </button>
@@ -372,6 +376,110 @@
 </div>
 
 <script>
+    function submitForm(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const form = document.getElementById("userForm");
+        const formData = new FormData(form);
+        const responseMessageDiv = document.getElementById("responseMessage");
+        const modal = document.getElementById("addUserModal");
+
+        // Convert FormData to a plain object
+        const formObject = {};
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
+
+        // Send the request as JSON
+        fetch('/admin/add-user', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json' // Set content type to JSON
+            },
+            body: JSON.stringify(formObject) // Convert the form object to JSON
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Success message from backend
+                } else if (response.status === 409) {
+                    throw new Error("Felhasználó már létezik");
+                } else {
+                    throw new Error("Ismeretlen hiba történt");
+                }
+            })
+            .then(message => {
+                if (responseMessageDiv) { // Display success message
+                    responseMessageDiv.classList.remove('hidden');
+                    responseMessageDiv.textContent = message;
+                    responseMessageDiv.style.backgroundColor = '#d4edda';
+                    responseMessageDiv.style.color = '#155724';
+                }
+            })
+            .catch(error => {
+                if (responseMessageDiv) { // Display error message
+                    responseMessageDiv.classList.remove('hidden');
+                    responseMessageDiv.textContent = error.message;
+                    responseMessageDiv.style.backgroundColor = '#f8d7da';
+                    responseMessageDiv.style.color = '#721c24';
+                }
+            })
+            .finally(() => {
+                if (modal) {
+                    modal.classList.add('hidden'); // Close the modal regardless of success or failure
+                }
+                setTimeout(() => window.location.reload(), 2000);
+            });
+    }
+
+    function deleteUser(event) {
+        event.preventDefault();
+
+        const responseMessageDiv = document.getElementById("responseMessage");
+        const modal = document.getElementById("deleteModal");
+        const username = document.getElementById('deleteUsernameInput').value;
+
+        fetch('/admin/delete-user/' + username, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Success message from backend
+                } else if (response.status === 409) {
+                    throw new Error("Felhasználó már létezik");
+                } else {
+                    throw new Error("Ismeretlen hiba történt");
+                }
+            })
+            .then(message => {
+                if (responseMessageDiv) { // Display success message
+                    responseMessageDiv.classList.remove('hidden');
+                    responseMessageDiv.textContent = message;
+                    responseMessageDiv.style.backgroundColor = '#d4edda';
+                    responseMessageDiv.style.color = '#155724';
+                }
+            })
+            .catch(error => {
+                if (responseMessageDiv) { // Display error message
+                    responseMessageDiv.classList.remove('hidden');
+                    responseMessageDiv.textContent = error.message;
+                    responseMessageDiv.style.backgroundColor = '#f8d7da';
+                    responseMessageDiv.style.color = '#721c24';
+                }
+            })
+            .finally(() => {
+                if (modal) {
+                    modal.classList.add('hidden'); // Close the modal regardless of success or failure
+                }
+                setTimeout(() => window.location.reload(), 2000);
+            });
+    }
+
+
     function switchTab(tabId) {
         // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(content => {
@@ -409,5 +517,7 @@
         document.getElementById('deleteModal').classList.remove('hidden');
     }
 </script>
+</div>
+</div>
 </body>
 </html>
