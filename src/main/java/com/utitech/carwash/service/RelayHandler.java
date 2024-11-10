@@ -15,8 +15,12 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-@Service
+
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -43,6 +47,8 @@ public class RelayHandler {
     private boolean washer1state = false;
     private boolean washer2state = false;
     private boolean vacuumState = false;
+    private boolean lamp1state = false;
+    private boolean lamp2state = false;
     private final LogRepository logRepository;
 
     public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
@@ -115,5 +121,15 @@ public class RelayHandler {
         log.setAmountUsed(desiredBalance);
         log.setService(service);
         logRepository.save(log);
+    }
+
+    public Map<String, Boolean> getStates() {
+        Map<String, Boolean> states = new HashMap<>();
+        states.put("washer1state", washer1state);
+        states.put("washer2state", washer2state);
+        states.put("vacuumState", vacuumState);
+        states.put("lamp1state", lamp1state);
+        states.put("lamp2state", lamp2state);
+        return states;
     }
 }

@@ -40,6 +40,18 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/washing-fee")
+    public ResponseEntity<?> setWashingFee(@ModelAttribute BalanceRequest request) {
+        adminService.addBalance(request.username(), request.balance());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/vacuum-fee")
+    public ResponseEntity<?> setVacuumFee(@ModelAttribute BalanceRequest request) {
+        adminService.addBalance(request.username(), request.balance());
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/add-balance")
     public ResponseEntity<?> addBalance(@ModelAttribute BalanceRequest request) {
         adminService.addBalance(request.username(), request.balance());

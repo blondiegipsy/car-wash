@@ -4,7 +4,9 @@ import com.utitech.carwash.model.*;
 import com.utitech.carwash.service.RelayHandler;
 import com.utitech.carwash.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
-    private final RelayHandler relayHandler;
+   // private final RelayHandler relayHandler;
     private final LogRepository logRepository;
     private final UserService userService;
 
@@ -39,21 +42,33 @@ public class HomeController {
         model.addAttribute("userBalance", userBalance);
         model.addAttribute("washingTariff", tariffs.getSecondForWashing());
         model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
-        model.addAttribute("washer1", relayHandler.isWasher1state());
-        model.addAttribute("washer2", relayHandler.isWasher2state());
-        model.addAttribute("vacuum", relayHandler.isVacuumState());
+      //  model.addAttribute("washer1", relayHandler.isWasher1state());
+     //   model.addAttribute("washer2", relayHandler.isWasher2state());
+     //   model.addAttribute("vacuum", relayHandler.isVacuumState());
         return "dashboard";
     }
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public String admin(Model model) {
+    public String admin(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
+
+       // model.addAttribute("states", relayHandler.getStates());
         model.addAttribute("users", getAllUsers());
         Long totalBalance = userRepository.findTotalBalance();
         model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("userCount", userRepository.getAllUsersNumber());
-        model.addAttribute("logs", logRepository.findAll());
+        model.addAttribute("logPage", logPage);
+        model.addAttribute("currentPage", page);
         return "admin";
+    }
+
+    @GetMapping("/admin/logs")
+    @ResponseBody
+    public ResponseEntity<Page<Log>> getLogs(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size) {
+        Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
+        return ResponseEntity.ok(logPage);
     }
 
     private List<User> getAllUsers() {
@@ -64,5 +79,5 @@ public class HomeController {
         return allUsers.stream()
                 .filter(user -> !user.getUsername().equals(currentUsername))
                 .collect(Collectors.toList());
-    };
+    }
 }

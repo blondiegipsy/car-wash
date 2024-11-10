@@ -56,4 +56,5 @@ public class AdminService {
         tariffs.setSecondForWashing(vacuumingFee);
         tariffsRepository.save(tariffs);
     }
+
 }

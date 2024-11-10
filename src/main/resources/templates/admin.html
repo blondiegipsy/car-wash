@@ -222,7 +222,7 @@
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700">Egyenleg</label>
-                                            <input type="number" id="editBalance" name="balance" step="0.01" required
+                                            <input type="number" id="editBalance" name="balance" required
                                                    class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                         </div>
                                         <div class="flex flex-col sm:flex-row-reverse gap-3 sm:gap-2 pt-4">
@@ -274,56 +274,54 @@
             <!-- History Tab -->
             <div id="history" class="tab-content">
                 <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Felhasználónév
-                            </th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Felhasznált összeg
-                            </th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Használt service
-                            </th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Létrehozva
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="log : ${logs}" class="hover:bg-gray-50">
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900" th:text="${log.username}">username</div>
-                            </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm font-medium" th:text="${log.amountUsed}">Amount Used</div>
-                            </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm font-medium text-gray-600" th:text="${log.service}">2024-11-06 15:45</div>
-                            </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm font-medium text-gray-600" th:text="${#dates.format(log.createdAt, 'yyyy-MM-dd HH:mm')}">2024-11-06 15:45</div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <section>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Felhasználónév
+                                </th>
+                                <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Felhasznált összeg
+                                </th>
+                                <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Használt service
+                                </th>
+                                <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Létrehozva
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody id="logTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- JavaScript will populate this -->
+                            </tbody>
+                        </table>
+
+                        <!-- Pagination controls -->
+                        <div class="flex justify-between mt-4">
+                            <button id="prevPage" class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" disabled>Előző</button>
+                            <span> <span id="currentPage"></span> / <span id="totalPages"></span></span>
+                            <button id="nextPage" class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600" disabled>Következő</button>
+                        </div>
+                    </section>
                 </div>
             </div>
             <!-- Settings Tab -->
             <div id="settings" class="tab-content">
                 <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                    <div id="responseBox" class="mt-4 p-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hidden"></div>
+
                     <form class="space-y-6">
                         <!-- Two Fields -->
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Kocsimosás percdíj   (1RON = x másodperc)</label>
-                                <input type="text"
-                                       name="apiKey"
-                                       class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                       placeholder="x">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">Kocsimosás percdíj (1RON = x másodperc)</label>
+                                    <input type="text" id="amountInput" name="apiKey" class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="x">
+                                </div>
+
                                 <div class="flex ml-1">
-                                    <button class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button id="saveButton" class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="saveData()">
                                         Mentés
                                     </button>
                                 </div>
@@ -345,26 +343,31 @@
 
                         <!-- Five Buttons with equal width -->
                         <div class="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4">
-                            <button type="button"
-                                    class="w-full sm:flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 text-sm">
-                                Mentés
+                      <!--      <button type="button"
+                                    th:classappend="${states['washer1state'] == false ? 'bg-green-500' : 'bg-red-500'}"
+                                    class="w-full sm:flex-1 px-4 py-2 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
+                                Mosó 1
                             </button>
                             <button type="button"
-                                    class="w-full sm:flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
-                                Tesztelés
+                                    th:classappend="${states['washer2state'] == false ? 'bg-green-500' : 'bg-red-500'}"
+                                    class="w-full sm:flex-1 px-4 py-2 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
+                                Mosó 2
                             </button>
                             <button type="button"
-                                    class="w-full sm:flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-200 text-sm">
-                                Frissítés
+                                    th:classappend="${states['vacuumState'] == false ? 'bg-green-500' : 'bg-red-500'}"
+                                    class="w-full sm:flex-1 px-4 py-2 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
+                                Porszivó
                             </button>
                             <button type="button"
-                                    class="w-full sm:flex-1 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-200 text-sm">
-                                Ellenőrzés
+                                    th:classappend="${states['lamp1state'] == false ? 'bg-green-500' : 'bg-red-500'}"
+                                    class="w-full sm:flex-1 px-4 py-2 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
+                                Lámpa 1
                             </button>
                             <button type="button"
-                                    class="w-full col-span-2 sm:col-span-1 sm:flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200 text-sm">
-                                Visszaállítás
-                            </button>
+                                    th:classappend="${states['lamp2state'] == false ? 'bg-green-500' : 'bg-red-500'}"
+                                    class="w-full col-span-2 sm:col-span-1 sm:flex-1 px-4 py-2 text-white rounded-lg hover:bg-green-600 transition duration-200 text-sm">
+                                Lámpa 2
+                            </button>-->
                         </div>
                     </form>
                 </div>
@@ -503,10 +506,8 @@
 
     function openEditModal(button) {
         const username = button.getAttribute('data-username');
-        const balance = button.getAttribute('data-balance');
         document.getElementById('editUsername').value = username;
         document.getElementById('editUsernameDisplay').textContent = username;
-        document.getElementById('editBalance').value = balance;
         document.getElementById('editModal').classList.remove('hidden');
     }
 
@@ -515,6 +516,79 @@
         document.getElementById('deleteUsername').textContent = username;
         document.getElementById('deleteUsernameInput').value = username;
         document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    async function fetchLogs(page = 0) {
+        const response = await fetch(`/admin/logs?page=${page}&size=10`);
+        const logPage = await response.json();
+
+        const logTableBody = document.querySelector("#logTableBody");
+        logTableBody.innerHTML = "";
+
+        logPage.content.forEach(log => {
+            const row = document.createElement("tr");
+            row.className = "hover:bg-gray-50";
+            row.innerHTML = `
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${log.username}</div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                        <div class="text-sm font-medium">${log.amountUsed}</div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                        <div class="text-sm font-medium text-gray-600">${log.service}</div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                        <div class="text-sm font-medium text-gray-600">${new Date(log.createdAt).toLocaleString('hu-HU', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+                    </td>
+                `;
+            logTableBody.appendChild(row);
+        });
+
+        document.querySelector("#currentPage").innerText = logPage.number + 1;
+        document.querySelector("#totalPages").innerText = logPage.totalPages;
+
+        document.querySelector("#prevPage").disabled = logPage.first;
+        document.querySelector("#nextPage").disabled = logPage.last;
+
+        document.querySelector("#prevPage").onclick = () => fetchLogs(page - 1);
+        document.querySelector("#nextPage").onclick = () => fetchLogs(page + 1);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => fetchLogs());
+
+
+    async function saveData() {
+        const responseBox = document.getElementById("responseBox");
+        const amountInput = document.getElementById("amountInput");
+        const amount = amountInput.value;
+
+        // Create the data object
+        const data = { amount };
+
+        try {
+            // Send a POST request
+            const response = await fetch('/admin/add-balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: data,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save data');
+            }
+
+            const result = await response.json();
+
+            // Display the response in the response box
+            responseBox.textContent = `Response: ${result.message}`;
+            responseBox.classList.remove("hidden");
+        } catch (error) {
+            responseBox.textContent = `Error: ${error.message}`;
+            responseBox.classList.remove("hidden");
+        }
     }
 </script>
 </div>
