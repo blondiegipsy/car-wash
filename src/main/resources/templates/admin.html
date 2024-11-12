@@ -213,12 +213,18 @@
                         <div class="min-h-screen flex items-center justify-center p-4">
                             <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto">
                                 <div class="p-6">
+                                    <div id="responseMessageEdit" class="mt-4 p-4 rounded-lg hidden">
+                                        <p id="messageTextEdit" class="text-center"></p>
+                                    </div>
                                     <h2 class="text-xl font-bold mb-4">Egyenleg hozzáadása</h2>
-                                    <form th:action="@{/admin/user/edit}" method="post" class="space-y-4">
+                                    <form class="space-y-4" method="post" onsubmit="setUserBalance(event)" id="editForm">
                                         <input type="hidden" id="editUsername" name="username">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700">Felhasználó: </label>
                                             <p id="editUsernameDisplay" class="mt-1 text-gray-600 font-medium"></p>
+                                        </div><div>
+                                            <label class="block text-sm font-medium text-gray-700">Egyenleg: </label>
+                                            <p id="usernameBalanceDisplay" class="mt-1 text-gray-600 font-medium"></p>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700">Egyenleg</label>
@@ -312,33 +318,38 @@
                     <div id="responseBox" class="mt-4 p-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hidden"></div>
 
                     <form class="space-y-6">
+
+                        <div id="responseMessageWashing" class="mt-4 p-4 rounded-lg hidden">
+                            <p id="messageTextWashing" class="text-center"></p>
+                        </div>
                         <!-- Two Fields -->
                         <div class="space-y-4">
                             <div>
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700">Kocsimosás percdíj (1RON = x másodperc)</label>
-                                    <input type="text" id="amountInput" name="apiKey" class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="x">
-                                </div>
+                               <div class="mb-4">
+                                   <label class="block text-sm font-medium text-gray-700">
+                                       Kocsimosás percdíj (1RON = x másodperc)
+                                   </label>
+                                   <input type="text" id="washerInput" class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="x">
+                               </div>
 
-                                <div class="flex ml-1">
-                                    <button id="saveButton" class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="saveData()">
-                                        Mentés
-                                    </button>
-                                </div>
+                               <div class="flex ml-1">
+                                   <button id="washerSave" type="button" class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="setWashing(event)">
+                                       Mentés
+                                   </button>
+                               </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Porszivó percdíj   (1RON = x másodperc)</label>
-                                <input type="url"
-                                       name="webhookUrl"
-                                       class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                       placeholder="x">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">Porszivo percdíj (1RON = x másodperc)</label>
+                                    <input type="text" id="vacuumInput" class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="x">
+                                </div>
+
                                 <div class="flex ml-1">
-                                    <button class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button id="vacuumSave" type="button" class="mt-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="setVacuuming(event)">
                                         Mentés
                                     </button>
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Five Buttons with equal width -->
@@ -506,7 +517,9 @@
 
     function openEditModal(button) {
         const username = button.getAttribute('data-username');
+        const balance = button.getAttribute('data-balance')
         document.getElementById('editUsername').value = username;
+        document.getElementById('usernameBalanceDisplay').textContent = balance;
         document.getElementById('editUsernameDisplay').textContent = username;
         document.getElementById('editModal').classList.remove('hidden');
     }
@@ -557,37 +570,149 @@
 
     document.addEventListener("DOMContentLoaded", () => fetchLogs());
 
+    async function setUserBalance(event) {
+        event.preventDefault(); // Prevent default form submission
 
-    async function saveData() {
-        const responseBox = document.getElementById("responseBox");
-        const amountInput = document.getElementById("amountInput");
-        const amount = amountInput.value;
+        const form = document.getElementById("editForm");
+        const formData = new FormData(form);
+        const responseMessageDiv = document.getElementById("responseMessageEdit");
+        const modal = document.getElementById("editBalance");
 
-        // Create the data object
-        const data = { amount };
+        // Convert FormData to a plain object
+        const formObject = {};
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
 
         try {
-            // Send a POST request
             const response = await fetch('/admin/add-balance', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json' // Set content type to JSON
                 },
-                body: data,
+                body: JSON.stringify(formObject) // Convert the form object to JSON
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to save data');
+            let message = "";
+
+            if (response.ok) {
+                message = await response.text(); // Success message from backend
+                // Display success message
+                if (responseMessageDiv) {
+                    responseMessageDiv.classList.remove('hidden');
+                    responseMessageDiv.textContent = message;
+                    responseMessageDiv.style.backgroundColor = '#d4edda';
+                    responseMessageDiv.style.color = '#155724';
+                }
+            } else if (response.status === 409) {
+                throw new Error("Felhasználó már létezik");
+            } else {
+                throw new Error("Ismeretlen hiba történt");
             }
 
-            const result = await response.json();
-
-            // Display the response in the response box
-            responseBox.textContent = `Response: ${result.message}`;
-            responseBox.classList.remove("hidden");
         } catch (error) {
-            responseBox.textContent = `Error: ${error.message}`;
-            responseBox.classList.remove("hidden");
+            // Display error message
+            if (responseMessageDiv) {
+                responseMessageDiv.classList.remove('hidden');
+                responseMessageDiv.textContent = error.message;
+                responseMessageDiv.style.backgroundColor = '#f8d7da';
+                responseMessageDiv.style.color = '#721c24';
+            }
+        } finally {
+            // Close the modal regardless of success or failure
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            setTimeout(() => window.location.reload(), 1000);
+        }
+    }
+
+    async function setWashing(event) {
+        event.preventDefault();
+
+        const washerInput = document.getElementById("washerInput").value;
+        const responseMessageDiv = document.getElementById("responseMessageWashing");
+
+        try {
+            const response = await fetch(`/admin/washing-fee?washerRate=${encodeURIComponent(washerInput)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const message = await response.text(); // Assuming the backend returns a success message
+
+                // Display success message
+                responseMessageDiv.classList.remove("hidden");
+                responseMessageDiv.textContent = "Success: " + message;
+                responseMessageDiv.style.backgroundColor = '#d4edda';
+                responseMessageDiv.style.color = '#155724';
+
+            } else {
+                throw new Error("Failed to save the data.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+
+            // Display error message
+            responseMessageDiv.classList.remove("hidden");
+            responseMessageDiv.textContent = error.message;
+            responseMessageDiv.style.backgroundColor = '#f8d7da';
+            responseMessageDiv.style.color = '#721c24';
+
+        } finally {
+            // Automatically hide the message after a few seconds
+            setTimeout(() => {
+                responseMessageDiv.classList.add("hidden");
+                responseMessageDiv.textContent = ""; // Clear the text
+            }, 5000);
+        }
+    }
+
+    async function setVacuuming(event) {
+        event.preventDefault();
+
+        const vacuumInput = document.getElementById("vacuumInput").value;
+        const responseMessageDiv = document.getElementById("responseMessageWashing");
+
+        try {
+            const response = await fetch(`/admin/vacuum-fee?vacuumRate=${encodeURIComponent(vacuumInput)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const message = await response.text(); // Assuming the backend returns a success message
+
+                // Display success message
+                responseMessageDiv.classList.remove("hidden");
+                responseMessageDiv.textContent = "Success: " + message;
+                responseMessageDiv.style.backgroundColor = '#d4edda';
+                responseMessageDiv.style.color = '#155724';
+
+            } else {
+                throw new Error("Failed to save the data.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+
+            // Display error message
+            responseMessageDiv.classList.remove("hidden");
+            responseMessageDiv.textContent = error.message;
+            responseMessageDiv.style.backgroundColor = '#f8d7da';
+            responseMessageDiv.style.color = '#721c24';
+
+        } finally {
+            // Automatically hide the message after a few seconds
+            setTimeout(() => {
+                responseMessageDiv.classList.add("hidden");
+                responseMessageDiv.textContent = ""; // Clear the text
+            }, 5000);
         }
     }
 </script>

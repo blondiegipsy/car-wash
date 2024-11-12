@@ -53,7 +53,7 @@ public class AdminService {
 
     public void setVacuumingFee(Integer vacuumingFee) {
         Tariffs tariffs = tariffsRepository.findAll().getFirst();
-        tariffs.setSecondForWashing(vacuumingFee);
+        tariffs.setSecondForVacuuming(vacuumingFee);
         tariffsRepository.save(tariffs);
     }
 
