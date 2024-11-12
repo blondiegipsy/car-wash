@@ -24,9 +24,8 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
-   // private final RelayHandler relayHandler;
+    private final RelayHandler relayHandler;
     private final LogRepository logRepository;
-    private final UserService userService;
 
     @GetMapping("/login")
     public String login() {
@@ -42,9 +41,9 @@ public class HomeController {
         model.addAttribute("userBalance", userBalance);
         model.addAttribute("washingTariff", tariffs.getSecondForWashing());
         model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
-      //  model.addAttribute("washer1", relayHandler.isWasher1state());
-     //   model.addAttribute("washer2", relayHandler.isWasher2state());
-     //   model.addAttribute("vacuum", relayHandler.isVacuumState());
+        model.addAttribute("washer1", relayHandler.isWasher1state());
+        model.addAttribute("washer2", relayHandler.isWasher2state());
+        model.addAttribute("vacuum", relayHandler.isVacuumState());
         return "dashboard";
     }
 
@@ -52,14 +51,17 @@ public class HomeController {
     @PreAuthorize("hasRole('ADMIN')")
     public String admin(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
+        Tariffs tariffs = tariffsRepository.findAll().getFirst();
 
-       // model.addAttribute("states", relayHandler.getStates());
+        model.addAttribute("states", relayHandler.getStates());
         model.addAttribute("users", getAllUsers());
         Long totalBalance = userRepository.findTotalBalance();
         model.addAttribute("totalBalance", totalBalance);
         model.addAttribute("userCount", userRepository.getAllUsersNumber());
         model.addAttribute("logPage", logPage);
         model.addAttribute("currentPage", page);
+        model.addAttribute("washerTariff", tariffs.getSecondForWashing());
+        model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
         return "admin";
     }
 

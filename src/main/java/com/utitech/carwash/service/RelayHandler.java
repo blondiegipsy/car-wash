@@ -16,18 +16,18 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 @RequiredArgsConstructor
 @Getter
 @Setter
+@Service
 public class RelayHandler {
     private final Context pi4j = Pi4J.newAutoContext();
     private final TaskScheduler taskScheduler;
     private final UserRepository userRepository;
+    private final LogRepository logRepository;
     private final TariffsRepository tariffsRepository;
 
     private static final int BUTTON_DISABLE_1 = 23;
@@ -36,6 +36,8 @@ public class RelayHandler {
     private static final int WASHER_2 = 27;
     private static final int VACUUM = 5;
     private static final int BUTTON_VACUUM_DISABLE = 6;
+    private static final int LAMP_1_BUTTON = 26;
+    private static final int LAMP_2_BUTTON = 16;
 
     private final DigitalOutput buttonDisable1 = pi4j.digitalOutput().create(BUTTON_DISABLE_1);
     private final DigitalOutput buttonDisable2 = pi4j.digitalOutput().create(BUTTON_DISABLE_2);
@@ -43,13 +45,14 @@ public class RelayHandler {
     private final DigitalOutput washer1 = pi4j.digitalOutput().create(WASHER_1);
     private final DigitalOutput washer2 = pi4j.digitalOutput().create(WASHER_2);
     private final DigitalOutput vacuum = pi4j.digitalOutput().create(VACUUM);
+    private final DigitalOutput lamp1 = pi4j.digitalOutput().create(LAMP_1_BUTTON);
+    private final DigitalOutput lamp2 = pi4j.digitalOutput().create(LAMP_2_BUTTON);
 
     private boolean washer1state = false;
     private boolean washer2state = false;
     private boolean vacuumState = false;
     private boolean lamp1state = false;
     private boolean lamp2state = false;
-    private final LogRepository logRepository;
 
     public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
@@ -112,6 +115,16 @@ public class RelayHandler {
             }
         }
         userRepository.save(user);
+    }
+
+    public void toggleLamp(Integer lamp) {
+        if (lamp == LAMP_1_BUTTON) {
+            lamp1.toggle();
+            lamp1state ^= true;
+        } else {
+            lamp2.toggle();
+            lamp2state ^= true;
+        }
     }
 
     private void createLog(String username, Integer desiredBalance, String service) {
