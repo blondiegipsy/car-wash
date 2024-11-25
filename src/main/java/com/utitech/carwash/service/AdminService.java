@@ -27,6 +27,7 @@ public class AdminService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
+        user.setIsAdmin(false);
         user.setBalance(0L);
         userRepository.save(user);
     }
