@@ -3,8 +3,10 @@ package com.utitech.carwash.controller;
 import com.utitech.carwash.controller.request.BalanceRequest;
 import com.utitech.carwash.controller.request.RegisterRequest;
 import com.utitech.carwash.service.AdminService;
+import com.utitech.carwash.service.RelayHandler;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminController {
 
     private final AdminService adminService;
+    private final RelayHandler relayHandler;
 
     @PostMapping("/add-user")
     public ResponseEntity<?> newUser(@RequestBody RegisterRequest request) {
@@ -65,5 +68,17 @@ public class AdminController {
         } catch (EntityExistsException e) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409));
         }
+    }
+
+    @PostMapping("/washer")
+    public ResponseEntity<?> adminWash(@RequestBody Integer washerNumber) {
+        relayHandler.adminWashing(washerNumber);
+        return ResponseEntity.ok("Mosó sikeresen elinditva/leállítva");
+    }
+
+    @PostMapping("/lamp")
+    public ResponseEntity<?> lampToggle(@RequestBody Integer lamp) {
+        relayHandler.toggleLamp(lamp);
+        return ResponseEntity.ok("Lámpa sikeresen felkapcsolva/leállítva");
     }
 }

@@ -4,6 +4,8 @@ import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.utitech.carwash.model.*;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -53,6 +55,30 @@ public class RelayHandler {
     private boolean vacuumState = false;
     private boolean lamp1state = false;
     private boolean lamp2state = false;
+
+    @PostConstruct
+    private void init() {
+        buttonDisable1.low();
+        buttonDisable2.low();
+        vacuumButtonDisable.low();
+        washer1.low();
+        washer2.low();
+        vacuum.low();
+        lamp1.low();
+        lamp2.low();
+    }
+
+    @PreDestroy
+    private void cleanup() {
+        buttonDisable1.low();
+        buttonDisable2.low();
+        vacuumButtonDisable.low();
+        washer1.low();
+        washer2.low();
+        vacuum.low();
+        lamp1.low();
+        lamp2.low();
+    }
 
     public void mainWashing(Integer washerNumber, String username, Long desiredBalance) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
@@ -124,6 +150,28 @@ public class RelayHandler {
         } else {
             lamp2.toggle();
             lamp2state ^= true;
+        }
+    }
+
+    public void adminWashing(Integer washerNumber) {
+        switch (washerNumber) {
+            case WASHER_1 -> {
+                washer1.toggle();
+                buttonDisable1.toggle();
+                washer1state ^= true;
+            }
+
+            case WASHER_2 -> {
+                washer2.toggle();
+                buttonDisable2.toggle();
+                washer2state ^= true;
+            }
+
+            case VACUUM -> {
+                vacuum.toggle();
+                vacuumButtonDisable.toggle();
+                vacuumState ^= true;
+            }
         }
     }
 

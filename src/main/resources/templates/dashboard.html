@@ -55,7 +55,7 @@
                 <div class="grid grid-cols-3 gap-4">
                     <!-- Button with Label -->
                     <div class="flex flex-col items-center">
-                        <span class="text-gray-700 font-bold mb-2">Mosó 1</span> <!-- Label above the button -->
+                        <span class="text-g ray-700 font-bold mb-2">Mosó 1</span> <!-- Label above the button -->
                     </div>
 
                     <!-- Second Button with Label -->
@@ -83,13 +83,13 @@
 
                 <div class="grid grid-cols-3 gap-4">
                     <div class="inline-flex items-center space-x-2">
-                        <span class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + washingTariff + 's'}">RON</span>
+                        <span id="washerInfo1" class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + washingTariff + 's'}">RON</span>
                     </div>
                     <div class="inline-flex items-center space-x-2">
-                        <span class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + washingTariff + 's'}">RON</span>
+                        <span id="washerInfo2" class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + washingTariff + 's'}">RON</span>
                     </div>
                     <div class="inline-flex items-center space-x-2">
-                        <span class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + vacuumTariff + 's'}">RON</span>
+                        <span id="vacuumInfo" class="text-gray-700 font-semibold whitespace-nowrap" th:text="${'1RON = ' + vacuumTariff + 's'}">RON</span>
                     </div>
                 </div>
 
@@ -97,14 +97,12 @@
         </div>
     </div>
 
-
-
     <!-- Footer -->
     <footer class="py-4 text-center text-sm text-gray-500">
         © 2024 Minden el van intézve
     </footer>
 
-    <script>
+    <script th:inline="javascript">
         function updateBalance(washerNumber) {
             const balanceInput = document.getElementById('balanceInput');
             const balance = balanceInput.value;
@@ -165,6 +163,20 @@
                 }, 300);
             }, 5000);
         }
+
+        let washerData = /*[[${washingTariff}]]*/ 1;
+        let vacuumData = /*[[${vacuumTariff}]]*/ 1;
+
+        const input = document.getElementById('balanceInput');
+        const washerInfo1 = document.getElementById("washerInfo1")
+        const washerInfo2 = document.getElementById("washerInfo2")
+        const vacuumInfo = document.getElementById("vacuumInfo")
+
+        input.addEventListener('input', () => {
+            washerInfo1.textContent = input.value +'RON =' + input.value * washerData + ' s';
+            washerInfo2.textContent = input.value +'RON =' + input.value * washerData + ' s';
+            vacuumInfo.textContent =  input.value +'RON =' + input.value * vacuumData + ' s';
+        });
     </script>
 </div>
 </body>
