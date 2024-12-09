@@ -17,14 +17,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RelayController {
 
-    private final RelayHandler relayHandler;
+    //private final RelayHandler relayHandler;
 
     @PostMapping("/washing")
     public ResponseEntity<?> turnRelayOn(@RequestBody WashingRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         try {
-            relayHandler.mainWashing(request.washer(), username, request.balance());
+        //    relayHandler.mainWashing(request.washer(), username, request.balance());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
@@ -34,9 +34,9 @@ public class RelayController {
     @GetMapping("/state")
     public ResponseEntity<?> getWasherState() {
         Map<String, Boolean> state = new HashMap<>();
-        state.put("washer1",relayHandler.isWasher1state());
-        state.put("washer2",relayHandler.isWasher2state());
-        state.put("vacuum",relayHandler.isVacuumState());
+//        state.put("washer1",relayHandler.isWasher1state());
+  //      state.put("washer2",relayHandler.isWasher2state());
+    //    state.put("vacuum",relayHandler.isVacuumState());
         return ResponseEntity.ok(state);
     }
 }

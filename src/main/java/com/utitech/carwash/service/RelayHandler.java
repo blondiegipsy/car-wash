@@ -24,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@Service
 public class RelayHandler {
     private final Context pi4j = Pi4J.newAutoContext();
     private final TaskScheduler taskScheduler;

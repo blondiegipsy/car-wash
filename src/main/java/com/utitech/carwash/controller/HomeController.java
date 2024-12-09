@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
-    private final RelayHandler relayHandler;
+  //  private final RelayHandler relayHandler;
     private final LogRepository logRepository;
 
     @GetMapping("/login")
@@ -41,9 +41,9 @@ public class HomeController {
         model.addAttribute("userBalance", userBalance);
         model.addAttribute("washingTariff", tariffs.getSecondForWashing());
         model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
-        model.addAttribute("washer1", relayHandler.isWasher1state());
-        model.addAttribute("washer2", relayHandler.isWasher2state());
-        model.addAttribute("vacuum", relayHandler.isVacuumState());
+   //     model.addAttribute("washer1", relayHandler.isWasher1state());
+     //   model.addAttribute("washer2", relayHandler.isWasher2state());
+       // model.addAttribute("vacuum", relayHandler.isVacuumState());
         return "dashboard";
     }
 
@@ -53,7 +53,7 @@ public class HomeController {
         Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
         Tariffs tariffs = tariffsRepository.findAll().getFirst();
 
-        model.addAttribute("states", relayHandler.getStates());
+       // model.addAttribute("states", relayHandler.getStates());
         model.addAttribute("users", getAllUsers());
         Long totalBalance = userRepository.findTotalBalance();
         model.addAttribute("totalBalance", totalBalance);

@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminController {
 
     private final AdminService adminService;
-    private final RelayHandler relayHandler;
+   // private final RelayHandler relayHandler;
 
     @PostMapping("/add-user")
     public ResponseEntity<?> newUser(@RequestBody RegisterRequest request) {
@@ -72,13 +72,13 @@ public class AdminController {
 
     @PostMapping("/washer")
     public ResponseEntity<?> adminWash(@RequestBody Integer washerNumber) {
-        relayHandler.adminWashing(washerNumber);
+      //  relayHandler.adminWashing(washerNumber);
         return ResponseEntity.ok("Mosó sikeresen elinditva/leállítva");
     }
 
     @PostMapping("/lamp")
     public ResponseEntity<?> lampToggle(@RequestBody Integer lamp) {
-        relayHandler.toggleLamp(lamp);
+    //    relayHandler.toggleLamp(lamp);
         return ResponseEntity.ok("Lámpa sikeresen felkapcsolva/leállítva");
     }
 }
