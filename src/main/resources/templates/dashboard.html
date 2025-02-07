@@ -14,17 +14,7 @@
 
     // Establish WebSocket connection
     function connect() {
-        const socket = new SockJS('/ws'); // Endpoint defined in WebSocketConfig
-        stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, function () {
-            console.log('Connected');
-
-            // Subscribe to /topic/messages
-            stompClient.subscribe('/topic/messages', function (message) {
-                showMessage(message.body);
-            });
-        });
     }
 
     // Send a message to the server
