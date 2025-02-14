@@ -5,7 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+/*
 @RestController
 @RequiredArgsConstructor
 public class StateController {
@@ -16,4 +16,4 @@ public class StateController {
     public void buttonState() {
         messagingTemplate.convertAndSend("/topic/button-state"  );
     }
-}
+}*/
