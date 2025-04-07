@@ -1,26 +1,26 @@
 package com.utitech.carwash.controller;
 
+import com.utitech.carwash.controller.request.BalanceRequest;
+import com.utitech.carwash.controller.request.WasherData;
 import com.utitech.carwash.model.*;
-import com.utitech.carwash.service.RelayHandler;
-import com.utitech.carwash.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller()
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
@@ -47,13 +47,29 @@ public class HomeController {
         return "dashboard";
     }
 
+    @GetMapping("/user-data")
+    @CrossOrigin(origins = "http://localhost:5173")
+    public ResponseEntity<?> userData(Model model) {
+        return ResponseEntity.ok(new BalanceRequest(userRepository.findAll().getFirst().getUsername(), userRepository.findAll().getFirst().getBalance()));
+    }
+
+    @GetMapping("/washing-status")
+    @CrossOrigin(origins = "http://localhost:5173")
+    public ResponseEntity<?> washingData() {
+        WasherData data = new WasherData(60000, 0, 50000, false, true, false);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON) // Explicit JSON beállítás
+                .body(data);
+    }    }
+
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public String admin(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+
         Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
         Tariffs tariffs = tariffsRepository.findAll().getFirst();
 
-       // model.addAttribute("states", relayHandler.getStates());
+        // model.addAttribute("states", relayHandler.getStates());
         model.addAttribute("users", getAllUsers());
         Long totalBalance = userRepository.findTotalBalance();
         model.addAttribute("totalBalance", totalBalance);
