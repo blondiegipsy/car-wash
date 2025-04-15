@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class HomeController {
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
-  //  private final RelayHandler relayHandler;
+    //  private final RelayHandler relayHandler;
     private final LogRepository logRepository;
 
     @GetMapping("/login")
@@ -41,9 +41,9 @@ public class HomeController {
         model.addAttribute("userBalance", userBalance);
         model.addAttribute("washingTariff", tariffs.getSecondForWashing());
         model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
-   //     model.addAttribute("washer1", relayHandler.isWasher1state());
-     //   model.addAttribute("washer2", relayHandler.isWasher2state());
-       // model.addAttribute("vacuum", relayHandler.isVacuumState());
+        //     model.addAttribute("washer1", relayHandler.isWasher1state());
+        //   model.addAttribute("washer2", relayHandler.isWasher2state());
+        // model.addAttribute("vacuum", relayHandler.isVacuumState());
         return "dashboard";
     }
 
@@ -60,7 +60,7 @@ public class HomeController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON) // Explicit JSON beállítás
                 .body(data);
-    }    }
+    }
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
@@ -99,3 +99,4 @@ public class HomeController {
                 .collect(Collectors.toList());
     }
 }
+

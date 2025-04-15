@@ -1,7 +1,6 @@
 package com.utitech.carwash.controller;
 
 import com.utitech.carwash.controller.request.WashingRequest;
-import com.utitech.carwash.service.RelayHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
