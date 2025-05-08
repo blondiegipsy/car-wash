@@ -23,6 +23,7 @@ public class Log {
     private Long id;
     private String username;
     private Integer amountUsed;
+    private String paymentMethod;
     private Timestamp createdAt;
     private String service;
 }
