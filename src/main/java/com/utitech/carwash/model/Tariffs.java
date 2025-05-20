@@ -15,7 +15,8 @@ import lombok.Setter;
 public class Tariffs {
 
     @Id
-    private Integer id;
-    private Integer secondForWashing;
-    private Integer secondForVacuuming;
+    private int id;
+    private int washingTime;
+    private int vacuumTime;
+    private int chassisWashingTime;
 }

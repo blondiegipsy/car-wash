@@ -1,7 +1,10 @@
 package com.utitech.carwash.service;
 
+import com.utitech.carwash.controller.request.BalanceRequest;
 import com.utitech.carwash.model.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,5 +21,11 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails userDetails = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Usename not found: " + username));
         return new User(userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities());
+    }
+
+    public BalanceRequest getBalance(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return new BalanceRequest(username, user.getBalance());
     }
 }

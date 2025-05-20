@@ -1,7 +1,10 @@
 package com.utitech.carwash.hardware;
 
+import com.utitech.carwash.controller.request.WasherData;
 import com.utitech.carwash.model.Tariffs;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public interface RelayService {
@@ -12,5 +15,7 @@ public interface RelayService {
 
     void adminOverride(int relayId);
 
-    boolean startWashing(int relayId, int price, Tariffs tariff);
+    Map<String, Boolean> getRelayStatus();
+
+    WasherData getWasherStates();
 }

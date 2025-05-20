@@ -1,86 +1,56 @@
 package com.utitech.carwash.controller;
 
-import com.utitech.carwash.controller.request.BalanceRequest;
 import com.utitech.carwash.controller.request.WasherData;
-import com.utitech.carwash.model.*;
+import com.utitech.carwash.model.Tariffs;
+import com.utitech.carwash.model.TariffsRepository;
+import com.utitech.carwash.model.UserRepository;
+import com.utitech.carwash.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Controller()
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class HomeController {
+
     private final UserRepository userRepository;
     private final TariffsRepository tariffsRepository;
-    private final LogRepository logRepository;
-
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
+    private final UserService userService;
 
     @GetMapping("/user-data")
     @CrossOrigin(origins = "http://localhost:5173")
-    public ResponseEntity<?> userData(Model model) {
-        return ResponseEntity.ok(new BalanceRequest(userRepository.findAll().getFirst().getUsername(), userRepository.findAll().getFirst().getBalance()));
+    public ResponseEntity<?> getUserData() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        return ResponseEntity.ok(userService.getBalance(username));
     }
 
     @GetMapping("/washing-status")
     @CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity<?> washingData() {
-        WasherData data = new WasherData(60000, 0, 50000, 434333, true, false, false, true);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON) // Explicit JSON beállítás
-                .body(data);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(userService);
     }
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String admin(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-
-        Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
+    @GetMapping("/tariffs")
+    @CrossOrigin(origins = "http://localhost:5173")
+    public ResponseEntity<?> getAllTariffs() {
         Tariffs tariffs = tariffsRepository.findAll().getFirst();
-
-        model.addAttribute("users", getAllUsers());
-        Long totalBalance = userRepository.findTotalBalance();
-        model.addAttribute("totalBalance", totalBalance);
-        model.addAttribute("userCount", userRepository.getAllUsersNumber());
-        model.addAttribute("logPage", logPage);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("washerTariff", tariffs.getSecondForWashing());
-        model.addAttribute("vacuumTariff", tariffs.getSecondForVacuuming());
-        return "admin";
-    }
-
-    @GetMapping("/admin/logs")
-    @ResponseBody
-    public ResponseEntity<Page<Log>> getLogs(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "10") int size) {
-        Page<Log> logPage = logRepository.findAll(PageRequest.of(page, size));
-        return ResponseEntity.ok(logPage);
-    }
-
-    private List<User> getAllUsers() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        List<User> allUsers = userRepository.findAll();
-
-        return allUsers.stream()
-                .filter(user -> !user.getUsername().equals(currentUsername))
-                .collect(Collectors.toList());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of(
+                        "washerTariff", tariffs.getWashingTime(),
+                        "vacuumTariff", tariffs.getVacuumTime(),
+                        "chassisWasherTariff", tariffs.getChassisWashingTime()
+                ));
     }
 }
-

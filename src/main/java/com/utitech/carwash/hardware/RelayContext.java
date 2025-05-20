@@ -4,6 +4,7 @@ import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
+import com.utitech.carwash.controller.request.WasherData;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
@@ -20,6 +21,10 @@ public class RelayContext {
 
     private final Map<Integer, DigitalOutput> pinOutputs = new HashMap<>();
     private final Map<Integer, Boolean> pinStates = new HashMap<>();
+    public int washer1Timer;
+    public int washer2Timer;
+    public int vacuumTimer;
+    public int chassisWasherTimer;
 
     private final Map<String, Integer> pinMap = Map.ofEntries(
             Map.entry("BUTTON_DISABLE_1", 23),
@@ -40,10 +45,6 @@ public class RelayContext {
             Map.entry("LAMP_7_BUTTON", 13)
     );
 
-    public int washer1Timer = 0;
-    public int washer2Timer = 0;
-    public int vacuumTimer = 0;
-    public int chassisWasherTimer = 0;
 
     @PostConstruct
     private void init() {
@@ -65,11 +66,28 @@ public class RelayContext {
         if (output == null) throw new IllegalArgumentException("Unknown pin: " + pin);
 
         boolean newState = !pinStates.get(pin);
-        output.state(DigitalState.getState(newState)); // true = HIGH, false = LOW
+        output.state(DigitalState.getState(newState));
         pinStates.put(pin, newState);
     }
 
-    public boolean getState(int pin) {
-        return pinStates.get(pin);
+    public Map<String, Boolean> getStates() {
+        Map<String, Boolean> namedStates = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : pinMap.entrySet()) {
+            namedStates.put(entry.getKey(), pinStates.get(entry.getValue()));
+        }
+        return namedStates;
+    }
+
+    public WasherData getWasherStates() {
+        return new WasherData(
+                washer1Timer,
+                washer2Timer,
+                vacuumTimer,
+                chassisWasherTimer,
+                !pinStates.get(pinMap.get("WASHER_1")),
+                !pinStates.get(pinMap.get("WASHER_2")),
+                !pinStates.get(pinMap.get("VACUUM")),
+                !pinStates.get(pinMap.get("CHASSIS_WASHER"))
+        );
     }
 }
